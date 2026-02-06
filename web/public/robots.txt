@@ -1,6 +1,40 @@
+# Allow all search engines to crawl the site
 User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /admin/
+Disallow: /_next/
+Disallow: /uploads/private/
 
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Other search engines
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Disallow bad bots
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+# Sitemap location
 Sitemap: https://emade.social/sitemap.xml

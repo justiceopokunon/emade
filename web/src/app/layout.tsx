@@ -41,6 +41,9 @@ export const metadata: Metadata = {
   creator: "E-MADE",
   publisher: "E-MADE",
   metadataBase: new URL(normalizedSiteUrl),
+  alternates: {
+    canonical: normalizedSiteUrl,
+  },
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
@@ -113,6 +116,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${envClass} dark ${inter.variable}`} suppressHydrationWarning>
       <head>
+        <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link rel="preload" href="/logo.png" as="image" />

@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeProvider";
 import { navItems as defaultNavItems } from "@/lib/data";
 
@@ -64,31 +63,12 @@ export function SiteNav() {
     if (menuOpen) setIsVisible(true);
   }, [menuOpen]);
 
-  const headerRef = useRef<HTMLDivElement | null>(null);
-  const [headerHeight, setHeaderHeight] = useState<number>(96);
-
-  useEffect(() => {
-    const update = () => {
-      const h = headerRef.current?.offsetHeight ?? 96;
-      setHeaderHeight(h);
-      try {
-        document.documentElement.style.setProperty("--header-height", `${h}px`);
-      } catch (e) {
-        // ignore
-      }
-    };
-    update();
-    window.addEventListener("resize", update, { passive: true });
-    return () => window.removeEventListener("resize", update);
-  }, [menuOpen, isVisible]);
-
   return (
     <>
-      <motion.div
-        ref={headerRef}
-        animate={{ y: isVisible ? 0 : -140, opacity: isVisible ? 1 : 0.5 }}
-        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 w-full px-4 pt-4 sm:px-8"
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 w-full px-4 pt-4 sm:px-8 transition-transform transition-opacity duration-200 ${
+          isVisible ? "translate-y-0 opacity-100" : "-translate-y-24 opacity-70"
+        }`}
       >
         <header className="flex w-full flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:px-5 sm:py-4 shadow-[0_18px_50px_-34px_rgba(0,0,0,0.7)] backdrop-blur-md">
         <div className="flex items-center gap-3 min-w-0">
@@ -107,40 +87,34 @@ export function SiteNav() {
         </div>
         <nav className="hidden items-center gap-3 text-sm font-medium text-slate-200 sm:flex sm:flex-1 sm:justify-end sm:flex-wrap">
           {navItems.map((item) => (
-            <motion.div key={item.label} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+            <div key={item.label} className="transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98]">
               <Link className="btn-ghost" href={item.href}>
                 {item.label}
               </Link>
-            </motion.div>
+            </div>
           ))}
-          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.98 }}>
+          <div className="transition-transform duration-150 hover:scale-[1.04] active:scale-[0.98]">
             <Link className="btn-primary" href="/admin" aria-label="Open admin deck">
               Admin deck
             </Link>
-          </motion.div>
+          </div>
           <ThemeToggle />
         </nav>
         <div className="flex items-center gap-3 sm:hidden">
           <ThemeToggle />
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             aria-label="Toggle navigation menu"
-            className="rounded-full border border-white/20 bg-white/10 p-3 text-white"
+            className="rounded-full border border-white/20 bg-white/10 p-3 text-white transition-transform duration-150 hover:scale-[1.05] active:scale-[0.95]"
             onClick={() => setMenuOpen((v) => !v)}
           >
             <span className="block h-0.5 w-5 bg-white" />
             <span className="mt-1 block h-0.5 w-5 bg-white" />
             <span className="mt-1 block h-0.5 w-5 bg-white" />
-          </motion.button>
+          </button>
         </div>
         </header>
         {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="sm:hidden"
-          >
+          <div className="sm:hidden">
             <div className="mx-auto mt-3 w-full rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[0_18px_50px_-34px_rgba(0,0,0,0.7)] backdrop-blur-md">
               <div className="flex flex-col gap-3 text-sm font-medium text-slate-200">
                 {navItems.map((item) => (
@@ -162,10 +136,10 @@ export function SiteNav() {
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
-        
-      </motion.div>
+      
+      </div>
       <div className="header-spacer w-full" aria-hidden="true" />
     </>
   );

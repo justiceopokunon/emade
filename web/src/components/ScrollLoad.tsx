@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ReactNode, useEffect, useRef, useState } from "react";
 
 interface ScrollLoadProps {
@@ -46,14 +45,11 @@ export function ScrollLoad({
   const visible = once ? hasIntersected : shouldRender;
 
   return (
-    <motion.div
+    <div
       ref={containerRef}
-      className={className}
-      initial={{ opacity: 0, y: 48 }}
-      animate={visible ? { opacity: 1, y: 0 } : { opacity: 0.15, y: 32 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className={`scrollload ${visible ? "scrollload-visible" : "scrollload-hidden"} ${className ?? ""}`}
     >
       {shouldRender ? children : <div style={{ minHeight }} className="w-full" />}
-    </motion.div>
+    </div>
   );
 }

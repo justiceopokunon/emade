@@ -130,9 +130,8 @@ export default function StoryDetailPage() {
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 60vw"
-              quality={35}
+              quality={50}
               priority
-              fetchPriority="high"
             />
           </div>
         )}

@@ -72,7 +72,7 @@ export default function TeamPage() {
                       fill
                       className="object-cover"
                       sizes="48px"
-                      quality={35}
+                      quality={50}
                     />
                   ) : (
                     member.avatar

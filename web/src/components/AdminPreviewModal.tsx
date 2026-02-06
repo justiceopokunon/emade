@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 interface PreviewModalProps {
   open: boolean;
@@ -28,22 +27,14 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-2 sm:p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="glass relative w-full max-w-5xl max-h-[95vh] overflow-y-auto rounded-2xl sm:rounded-3xl shadow-2xl"
-      >
+      <div className="glass relative w-full max-w-5xl max-h-[95vh] overflow-y-auto rounded-2xl sm:rounded-3xl shadow-2xl">
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between bg-[var(--panel)] border-b border-white/10 p-4 sm:p-6 backdrop-blur-sm">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Live Preview</p>
             <h2 className="text-xl font-semibold text-white capitalize">{section}</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-full border border-white/20 bg-white/10 p-2 text-white transition hover:border-white/40 hover:bg-white/20"
-          >
+          <button onClick={onClose} className="btn-ghost btn-sm">
             <span className="sr-only">Close</span>
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -58,7 +49,7 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
             <div className="space-y-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.28em] text-slate-400 mb-2">Hero Message Preview</p>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-8">
+                <div className="glass rounded-2xl p-8">
                   <p className="text-3xl font-bold text-white leading-tight">{data.heroMessage}</p>
                 </div>
               </div>
@@ -71,7 +62,7 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
               <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Stories Preview ({data.stories.length})</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 {data.stories.map((story, idx) => (
-                  <div key={idx} className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden hover:border-white/20 transition">
+                  <div key={idx} className="glass rounded-2xl overflow-hidden">
                     {story.imageUrl ? (
                       <div className="relative h-40 w-full bg-slate-900">
                         <img src={story.imageUrl} alt={story.title} className="w-full h-full object-cover" onError={(e) => {e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23333' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='14' fill='%23666'%3EImage not found%3C/text%3E%3C/svg%3E"}} />
@@ -99,7 +90,7 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
               <p className="text-xs uppercase tracking-[0.28em] text-slate-400">DIY Guides Preview ({data.diyProjects.length})</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 {data.diyProjects.map((project, idx) => (
-                  <div key={idx} className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden hover:border-white/20 transition">
+                  <div key={idx} className="glass rounded-2xl overflow-hidden">
                     {project.imageUrl ? (
                       <div className="relative h-40 w-full bg-slate-900">
                         <img src={project.imageUrl} alt={project.name} className="w-full h-full object-cover" onError={(e) => {e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23333' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='14' fill='%23666'%3EImage not found%3C/text%3E%3C/svg%3E"}} />
@@ -129,7 +120,7 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
               <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Team Members Preview ({data.teamMembers.length})</p>
               <div className="grid gap-6 sm:grid-cols-2">
                 {data.teamMembers.map((member, idx) => (
-                  <div key={idx} className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center hover:border-white/20 transition">
+                  <div key={idx} className="glass rounded-2xl p-6 text-center">
                     {member.imageUrl ? (
                       <div className="relative h-32 w-32 mx-auto mb-4 rounded-full overflow-hidden border-2 border-white/20 bg-slate-900">
                         <img src={member.imageUrl} alt={member.name} className="w-full h-full object-cover" onError={(e) => {e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Ccircle cx='64' cy='64' r='64' fill='%23333'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='12' fill='%23666'%3ENo image%3C/text%3E%3C/svg%3E"}} />
@@ -154,7 +145,7 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
               <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Stats Preview</p>
               <div className="grid gap-4 sm:grid-cols-3">
                 {data.stats.map((stat, idx) => (
-                  <div key={idx} className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center hover:border-white/20 transition">
+                  <div key={idx} className="glass rounded-2xl p-6 text-center">
                     <p className="text-3xl font-bold text-lime-300">{stat.value}</p>
                     <p className="text-sm text-white mt-2 font-medium">{stat.label}</p>
                     <p className="text-xs text-slate-400 mt-2">{stat.detail}</p>
@@ -169,7 +160,7 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
             <div className="space-y-6">
               <div>
                 <p className="text-xs uppercase tracking-[0.28em] text-slate-400 mb-3">Gallery Hero</p>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-8">
+                <div className="glass rounded-2xl p-8">
                   <p className="text-xs uppercase tracking-[0.28em] text-slate-400 mb-2">{data.galleryContent.hero?.eyebrow}</p>
                   <h3 className="text-3xl font-bold text-white mb-3">{data.galleryContent.hero?.title}</h3>
                   <p className="text-slate-300">{data.galleryContent.hero?.description}</p>
@@ -180,7 +171,7 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
                 <p className="text-xs uppercase tracking-[0.28em] text-slate-400 mb-3">Gallery Sections</p>
                 <div className="grid gap-4">
                   {data.galleryContent.sections?.map((section: any, idx: number) => (
-                    <div key={idx} className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-white/20 transition">
+                    <div key={idx} className="glass rounded-2xl p-6">
                       <p className="text-xs uppercase tracking-[0.28em] text-slate-400 mb-2">{section.eyebrow}</p>
                       <h4 className="text-lg font-semibold text-white mb-2">{section.title}</h4>
                       <p className="text-sm text-slate-300">{section.description}</p>
@@ -203,7 +194,7 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
                       return (
                         <div
                           key={idx}
-                          className={`relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:border-white/20 transition ${tileSizeClasses[tile.size] || tileSizeClasses.square}`}
+                          className={`relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 ${tileSizeClasses[tile.size] || tileSizeClasses.square}`}
                         >
                           {tile.src && tile.src.trim() ? (
                             <img src={tile.src} alt={tile.title || "Gallery tile"} className="h-full w-full object-cover" onError={(e) => {e.currentTarget.style.display = "none"}} />
@@ -274,10 +265,10 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
           {section === "submit-cta" && data.submitCta && (
             <div className="space-y-4">
               <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Submit CTA Preview</p>
-              <div className="rounded-2xl border border-lime-400/20 bg-lime-400/5 p-8 text-center">
+              <div className="glass rounded-2xl p-8 text-center">
                 <h3 className="text-2xl font-bold text-white">{data.submitCta.title}</h3>
                 <p className="text-slate-300 mt-3">{data.submitCta.description}</p>
-                <button className="mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-lime-400 to-lime-300 text-black font-semibold transition hover:shadow-lg hover:shadow-lime-400/50">
+                <button className="btn-primary mt-6">
                   {data.submitCta.buttonText}
                 </button>
                 <p className="text-sm text-slate-400 mt-4">{data.submitCta.email}</p>
@@ -288,14 +279,11 @@ export default function AdminPreviewModal({ open, onClose, section, data }: Prev
 
         {/* Footer */}
         <div className="sticky bottom-0 flex items-center justify-end gap-3 bg-[var(--panel)] border-t border-white/10 p-4 sm:p-6 backdrop-blur-sm">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 rounded-full border border-white/20 bg-white/10 text-white transition hover:border-white/40 hover:bg-white/20"
-          >
+          <button onClick={onClose} className="btn-ghost">
             Close
           </button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

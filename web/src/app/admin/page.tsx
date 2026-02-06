@@ -88,7 +88,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [showError, setShowError] = useState(false);
   const [heroMessage, setHeroMessage] = useState(
-    "We turn e-waste into resilient public infrastructure."
+    "E-MADE is a youth-led initiative that tackles the growing crisis of electronic waste by collecting, safely recycling, and repurposing discarded electronics. The project reduces toxic pollution from improper dumping and burning of e-waste while transforming valuable components into new products for community use. Through public education, hands-on innovation, and responsible recycling practices, E-MADE protects human health, creates green skills for young people, and promotes a circular economy where electronics are reused instead of wasted."
   );
   const [published, setPublished] = useState(true);
   const [selectedBuild, setSelectedBuild] = useState(diyProjects[0].name);
@@ -810,7 +810,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-3">
           <Image
             src="/logo.png"
-            alt="E-Made logo"
+            alt="E-MADE logo"
             width={72}
             height={72}
             className="object-contain drop-shadow-[0_12px_30px_rgba(158,240,26,0.45)] saturate-150"
@@ -888,7 +888,7 @@ export default function AdminPage() {
             onClick={() => setNavMenuOpen((prev) => !prev)}
             aria-expanded={navMenuOpen}
             aria-controls="admin-section-nav"
-            className={`glass fixed bottom-6 right-6 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/15 text-xl font-semibold text-white transition hover:bg-white/10 lg:hidden ${
+            className={`glass fixed bottom-6 right-6 z-40 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/15 text-xl font-semibold text-white lg:hidden ${
               navMenuOpen ? "bg-white/20" : "bg-white/5"
             }`}
           >
@@ -902,18 +902,14 @@ export default function AdminPage() {
           {navMenuOpen && (
             <aside
               id="admin-section-nav"
-              className="glass fixed inset-x-6 bottom-24 z-40 max-h-[70vh] overflow-y-auto rounded-3xl border border-white/10 p-5 shadow-[0_20px_60px_-40px_rgba(0,0,0,0.8)] transition-all duration-200 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[24rem] lg:left-auto lg:right-12"
+              className="glass fixed inset-x-6 bottom-24 z-40 max-h-[70vh] overflow-y-auto rounded-3xl border border-white/10 p-5 shadow-[0_20px_60px_-40px_rgba(0,0,0,0.8)] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[24rem] lg:left-auto lg:right-12"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs uppercase tracking-[0.28em] text-slate-300">Sections</p>
                   <p className="mt-1 text-sm text-slate-400">Jump to any block.</p>
                 </div>
-                <button
-                  type="button"
-                  className="rounded-full border border-white/15 px-3 py-1 text-[10px] uppercase tracking-[0.32em] text-white transition hover:bg-white/10"
-                  onClick={() => setNavMenuOpen(false)}
-                >
+                <button type="button" className="btn-ghost btn-sm" onClick={() => setNavMenuOpen(false)}>
                   Close
                 </button>
               </div>
@@ -925,7 +921,7 @@ export default function AdminPage() {
                       key={section.id}
                       type="button"
                       onClick={() => handleSectionNav(section.id)}
-                      className={`w-full rounded-xl px-4 py-2 text-left text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-300 ${
+                      className={`w-full rounded-xl px-4 py-2 text-left text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-300 ${
                         active
                           ? "bg-white/20 text-white shadow-[0_12px_30px_-24px_rgba(158,240,26,0.6)]"
                           : "bg-white/5 text-slate-300 hover:bg-white/10"
@@ -1127,7 +1123,7 @@ export default function AdminPage() {
                       />
                       <label
                         htmlFor={`gallery-tile-upload-${idx}`}
-                        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:border-white/40"
+                        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white"
                       >
                         Upload image
                       </label>
@@ -1345,7 +1341,7 @@ export default function AdminPage() {
                   />
                   <label
                     htmlFor="ewaste-upload"
-                    className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:border-white/40"
+                    className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white"
                   >
                     Upload from PC
                   </label>
@@ -1397,7 +1393,7 @@ export default function AdminPage() {
                   />
                   <label
                     htmlFor="story-upload"
-                    className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:border-white/40"
+                    className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white"
                   >
                     Upload from PC
                   </label>
@@ -1593,7 +1589,7 @@ export default function AdminPage() {
                   />
                   <label
                     htmlFor={`diy-image-upload-${idx}`}
-                    className="col-span-full inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:border-white/40"
+                    className="col-span-full inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white"
                   >
                     Upload guide image
                   </label>
@@ -1650,13 +1646,13 @@ export default function AdminPage() {
                   />
                   <label
                     htmlFor={`pdf-upload-${idx}`}
-                    className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:border-white/40"
+                    className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white"
                   >
                     Upload PDF file
                   </label>
                   <button
                     type="button"
-                    className="inline-flex w-fit items-center gap-2 rounded-full border border-lime-400/40 bg-lime-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-lime-300 transition hover:border-lime-400/70 hover:bg-lime-400/20"
+                    className="inline-flex w-fit items-center gap-2 rounded-full border border-lime-400/40 bg-lime-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-lime-300"
                     onClick={() => generateDiyPdfWithGemini(project.name)}
                   >
                     Generate PDF (AI)
@@ -1898,7 +1894,7 @@ export default function AdminPage() {
                     />
                     <label
                       htmlFor={`story-image-upload-${idx}`}
-                      className="mt-2 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white transition hover:border-white/40"
+                      className="mt-2 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white"
                     >
                       Upload story image
                     </label>

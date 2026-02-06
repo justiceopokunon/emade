@@ -19,7 +19,7 @@ type SiteData = {
 };
 
 const heroFallback =
-  "E-MADE transforms electronic waste into opportunity — collecting, repairing, and responsibly recycling devices while training communities and creating green pathways for youth.";
+  "E-MADE is a youth-led initiative that tackles the growing crisis of electronic waste by collecting, safely recycling, and repurposing discarded electronics. The project reduces toxic pollution from improper dumping and burning of e-waste while transforming valuable components into new products for community use. Through public education, hands-on innovation, and responsible recycling practices, E-MADE protects human health, creates green skills for young people, and promotes a circular economy where electronics are reused instead of wasted.";
 
 const getApiBase = async () => {
   const host = (await headers()).get("host");
@@ -197,7 +197,7 @@ export default async function Home() {
               <p className="text-xs uppercase tracking-[0.28em] text-slate-300">Community signals</p>
               <h2 className="text-3xl font-semibold text-white sm:text-4xl">Stories, safety tips, and local action</h2>
             </div>
-            <Link className="btn-ghost transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" href="/stories">
+            <Link className="btn-ghost" href="/stories">
               Visit the forum
             </Link>
           </div>

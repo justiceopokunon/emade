@@ -8,7 +8,7 @@
 
 ### 1. **Problem Definition** (20 points)
 
-- [x] **Clear problem statement:** Electronic waste is the fastest-growing waste stream; informal recycling practices in underserved communities expose workers and families to toxic fumes, chemical contamination, data privacy risks, and lost economic opportunity.
+- [x] **Clear problem statement:** E-MADE is a youth-led initiative that tackles the growing crisis of electronic waste by collecting, safely recycling, and repurposing discarded electronics. The project reduces toxic pollution from improper dumping and burning of e-waste while transforming valuable components into new products for community use. Through public education, hands-on innovation, and responsible recycling practices, E-MADE protects human health, creates green skills for young people, and promotes a circular economy where electronics are reused instead of wasted.
 - [x] **Real & measurable:** 18.4k+ neighbors trained, 3,120+ safe drop-offs guided, 100 youth engaged
 - [x] **Community-centered:** Stories from real residents (Amina Patel, Diego Chen, Salvador Nnadozie) document lived experiences
 - [x] **Timeliness:** E-waste is urgent (9x faster growth than general waste)

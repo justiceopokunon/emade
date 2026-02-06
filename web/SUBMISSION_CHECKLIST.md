@@ -161,7 +161,7 @@ E-MADE: Transforming E-Waste into Opportunity
 
 **One-Line Description**
 ```
-Community-led e-waste training, DIY guides, and peer networks for underserved populations.
+Youth-led initiative collecting, safely recycling, and repurposing e-waste while educating communities and creating green skills.
 ```
 
 **Problem (200 words)**

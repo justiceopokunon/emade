@@ -16,7 +16,9 @@
 
 ## 💡 Our Solution
 
-**E-MADE democratizes access to safe, scalable e-waste management through:**
+E-MADE is a youth-led initiative that tackles the growing crisis of electronic waste by collecting, safely recycling, and repurposing discarded electronics. The project reduces toxic pollution from improper dumping and burning of e-waste while transforming valuable components into new products for community use. Through public education, hands-on innovation, and responsible recycling practices, E-MADE protects human health, creates green skills for young people, and promotes a circular economy where electronics are reused instead of wasted.
+
+**E-MADE delivers impact through:**
 
 1. **Community-Led Training** – Real stories from residents (Amina, Diego, Salvador) teach peers how to protect themselves
 2. **DIY Blueprints** – Field-tested guides for building local drop-off stations, device wiping centers, and battery collection networks

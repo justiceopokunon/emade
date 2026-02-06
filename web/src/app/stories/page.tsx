@@ -48,7 +48,7 @@ export default function StoriesPage() {
         <div className="flex items-center gap-3">
           <Image
             src="/logo.png"
-            alt="E-Made logo"
+            alt="E-MADE logo"
             width={72}
             height={72}
             className="object-contain drop-shadow-[0_12px_30px_rgba(158,240,26,0.45)] saturate-150"

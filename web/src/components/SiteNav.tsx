@@ -74,7 +74,7 @@ export function SiteNav() {
         <div className="flex items-center gap-3 min-w-0">
           <Image
             src="/logo.png"
-            alt="E-Made logo"
+            alt="E-MADE logo"
             width={60}
             height={60}
             className="object-contain drop-shadow-[0_12px_30px_rgba(158,240,26,0.45)] saturate-150"

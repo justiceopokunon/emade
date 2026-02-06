@@ -36,7 +36,7 @@ export default function AdminLoginModal({ open, onClose }: { open: boolean; onCl
   return (
     <div className="fixed inset-0 z-60 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-md rounded-xl bg-surface p-6 shadow-lg">
+      <div className="glass relative z-10 w-full max-w-md rounded-2xl p-6 shadow-lg">
         <h3 className="text-lg font-semibold text-white">Admin login</h3>
         <p className="mt-2 text-sm text-slate-300">Enter the admin password to open the stewardship console.</p>
         <input

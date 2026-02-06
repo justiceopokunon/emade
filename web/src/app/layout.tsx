@@ -13,7 +13,7 @@ const inter = Inter({
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME ?? "E-MADE";
 const siteDescription =
   process.env.NEXT_PUBLIC_SITE_DESCRIPTION ??
-  "E-MADE transforms electronic waste into opportunity through responsible recycling, repair, and community empowerment. Free guides, training, and local programs.";
+  "E-MADE is a youth-led initiative that tackles the growing crisis of electronic waste by collecting, safely recycling, and repurposing discarded electronics. The project reduces toxic pollution from improper dumping and burning of e-waste while transforming valuable components into new products for community use. Through public education, hands-on innovation, and responsible recycling practices, E-MADE protects human health, creates green skills for young people, and promotes a circular economy where electronics are reused instead of wasted.";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://emade.social";
 
 const normalizedSiteUrl = siteUrl.startsWith("http://") || siteUrl.startsWith("https://") ? siteUrl : `https://${siteUrl}`;

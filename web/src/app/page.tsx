@@ -71,13 +71,13 @@ export default async function Home() {
               </h1>
               <p className="max-w-2xl text-lg text-slate-200">{heroCopy}</p>
               <div className="flex flex-wrap gap-3">
-                <Link className="btn-primary transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98]" href="/diy">
+                <Link className="btn-primary" href="/diy">
                   Open the DIY safety kit
                 </Link>
-                <Link className="btn-ghost transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" href="/stories">
+                <Link className="btn-ghost" href="/stories">
                   Read local stories
                 </Link>
-                <Link className="btn-ghost transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" href="/admin" prefetch={false}>
+                <Link className="btn-ghost" href="/admin" prefetch={false}>
                   Stewardship console
                 </Link>
               </div>
@@ -85,7 +85,7 @@ export default async function Home() {
                 {statsData.map((stat) => (
                   <div
                     key={stat.label}
-                    className="glass relative overflow-hidden rounded-2xl p-4 transition-transform duration-200 hover:-translate-y-1"
+                    className="glass relative overflow-hidden rounded-2xl p-4"
                   >
                     <p className="text-sm text-slate-300">{stat.label}</p>
                     <p className="mt-1 text-3xl font-semibold text-white">{stat.value}</p>
@@ -133,7 +133,7 @@ export default async function Home() {
                   </div>
                 </div>
               </div>
-              <Link className="btn-primary transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98]" href="/stories">
+              <Link className="btn-primary" href="/stories">
                 Explore community signals
               </Link>
             </div>
@@ -146,7 +146,7 @@ export default async function Home() {
               <p className="text-xs uppercase tracking-[0.28em] text-slate-300">DIY lab</p>
               <h2 className="text-3xl font-semibold text-white sm:text-4xl">Local playbooks for safe handling</h2>
             </div>
-            <Link className="btn-ghost transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" href="/diy">
+            <Link className="btn-ghost" href="/diy">
               View all playbooks
             </Link>
           </div>
@@ -158,15 +158,15 @@ export default async function Home() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 80vw"
-                quality={70}
+                quality={50}
               />
             ) : null}
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {projects.map((project) => (
               <Link key={project.name} href="/diy" className="h-full">
-                <div className="glass group relative h-full cursor-pointer overflow-hidden rounded-2xl border border-white/10 p-5 transition-transform duration-200 hover:-translate-y-1">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                <div className="glass group relative h-full cursor-pointer overflow-hidden rounded-2xl border border-white/10 p-5">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0" />
                   {project.imageUrl && (
                     <div className="relative mb-3 h-36 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-900/50">
                       <Image
@@ -175,7 +175,7 @@ export default async function Home() {
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={70}
+                        quality={50}
                       />
                     </div>
                   )}
@@ -209,14 +209,14 @@ export default async function Home() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 80vw"
-                quality={70}
+                quality={50}
               />
             ) : null}
           </div>
           <div className="grid gap-5 md:grid-cols-3">
             {storyList.slice(0, 3).map((story) => (
               <Link key={story.slug} href={`/stories/${story.slug}`} className="h-full">
-                <article className="glass relative flex h-full cursor-pointer flex-col justify-between rounded-2xl border border-white/10 p-5 transition-transform duration-200 hover:-translate-y-1">
+                <article className="glass relative flex h-full cursor-pointer flex-col justify-between rounded-2xl border border-white/10 p-5">
                   <div className="space-y-3">
                     {story.imageUrl && (
                       <div className="relative h-36 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-900/50">
@@ -226,7 +226,7 @@ export default async function Home() {
                           fill
                           className="object-cover"
                           sizes="(max-width: 768px) 100vw, 33vw"
-                          quality={70}
+                          quality={50}
                         />
                       </div>
                     )}
@@ -260,7 +260,7 @@ export default async function Home() {
             </div>
             <a
               href={`mailto:${submitCta.email}?subject=E-Made Submission`}
-              className="btn-primary whitespace-nowrap transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2"
+              className="btn-primary whitespace-nowrap flex items-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

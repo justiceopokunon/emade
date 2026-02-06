@@ -67,7 +67,7 @@ export default function DiyPage() {
         {projects.map((project) => (
           <div
             key={project.name}
-            className="glass relative overflow-hidden rounded-3xl border border-white/10 p-6 transition-transform duration-200 hover:-translate-y-1"
+            className="glass relative overflow-hidden rounded-3xl border border-white/10 p-6"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-emerald-400/5" />
             <div className="relative space-y-3">
@@ -79,7 +79,7 @@ export default function DiyPage() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    quality={70}
+                    quality={50}
                   />
                 </div>
               )}

@@ -139,13 +139,13 @@ export default function RootLayout({
                     href="https://instagram.com/emade.social"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-slate-300 transition-colors hover:text-primary"
+                    className="text-sm text-slate-300"
                   >
                     Instagram @emade.social
                   </a>
                   <a
                     href="mailto:admin@emade.social"
-                    className="text-sm text-slate-300 transition-colors hover:text-primary"
+                    className="text-sm text-slate-300"
                   >
                     admin@emade.social
                   </a>

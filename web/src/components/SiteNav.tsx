@@ -66,7 +66,7 @@ export function SiteNav() {
   return (
     <>
       <div
-        className={`fixed top-0 left-0 right-0 z-50 w-full px-4 pt-4 sm:px-8 transition-transform transition-opacity duration-200 ${
+        className={`fixed top-0 left-0 right-0 z-50 w-full px-4 pt-4 sm:px-8 ${
           isVisible ? "translate-y-0 opacity-100" : "-translate-y-24 opacity-70"
         }`}
       >
@@ -87,13 +87,13 @@ export function SiteNav() {
         </div>
         <nav className="hidden items-center gap-3 text-sm font-medium text-slate-200 sm:flex sm:flex-1 sm:justify-end sm:flex-wrap">
           {navItems.map((item) => (
-            <div key={item.label} className="transition-transform duration-150 hover:scale-[1.03] active:scale-[0.98]">
+            <div key={item.label}>
               <Link className="btn-ghost" href={item.href}>
                 {item.label}
               </Link>
             </div>
           ))}
-          <div className="transition-transform duration-150 hover:scale-[1.04] active:scale-[0.98]">
+          <div>
             <Link className="btn-primary" href="/admin" aria-label="Open admin deck">
               Admin deck
             </Link>
@@ -104,7 +104,7 @@ export function SiteNav() {
           <ThemeToggle />
           <button
             aria-label="Toggle navigation menu"
-            className="rounded-full border border-white/20 bg-white/10 p-3 text-white transition-transform duration-150 hover:scale-[1.05] active:scale-[0.95]"
+            className="rounded-full border border-white/20 bg-white/10 p-3 text-white"
             onClick={() => setMenuOpen((v) => !v)}
           >
             <span className="block h-0.5 w-5 bg-white" />

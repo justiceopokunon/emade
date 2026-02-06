@@ -215,7 +215,7 @@ export default function GalleryPage() {
               {isRemote(src) ? (
                 <img src={src} alt="E-waste context" className="h-full w-full object-cover" loading="lazy" width={800} height={480} />
               ) : (
-                <Image src={src} alt="E-waste context" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={70} />
+                <Image src={src} alt="E-waste context" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={50} />
               )}
             </div>
           ))}
@@ -242,7 +242,7 @@ export default function GalleryPage() {
               {isRemote(src) ? (
                 <img src={src} alt="Story highlight" className="h-full w-full object-cover" loading="lazy" width={800} height={480} />
               ) : (
-                <Image src={src} alt="Story highlight" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={70} />
+                <Image src={src} alt="Story highlight" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={50} />
               )}
             </div>
           ))}
@@ -269,7 +269,7 @@ export default function GalleryPage() {
               {isRemote(src) ? (
                 <img src={src} alt="Story cover" className="h-full w-full object-cover" loading="lazy" width={800} height={480} />
               ) : (
-                <Image src={src} alt="Story cover" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={70} />
+                <Image src={src} alt="Story cover" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={50} />
               )}
             </div>
           ))}
@@ -296,7 +296,7 @@ export default function GalleryPage() {
               {isRemote(src) ? (
                 <img src={src} alt="Guide cover" className="h-full w-full object-cover" loading="lazy" width={800} height={480} />
               ) : (
-                <Image src={src} alt="Guide cover" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={70} />
+                <Image src={src} alt="Guide cover" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={50} />
               )}
             </div>
           ))}

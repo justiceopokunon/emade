@@ -96,7 +96,7 @@ export default function StoriesPage() {
         {storyList.map((story) => (
           <article
             key={story.title}
-            className="glass relative flex h-full flex-col gap-3 rounded-2xl border border-white/10 p-5 transition-transform duration-200 hover:-translate-y-1"
+            className="glass relative flex h-full flex-col gap-3 rounded-2xl border border-white/10 p-5"
           >
             {story.imageUrl && (
               <div className="relative h-36 w-full overflow-hidden rounded-xl border border-white/10">
@@ -106,7 +106,7 @@ export default function StoriesPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  quality={70}
+                  quality={50}
                 />
               </div>
             )}

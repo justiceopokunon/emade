@@ -60,7 +60,7 @@ export default function TeamPage() {
         {members.map((member) => (
           <div
             key={member.name}
-            className="glass relative rounded-3xl border border-white/10 p-5 transition-transform duration-200 hover:-translate-y-1"
+            className="glass relative rounded-3xl border border-white/10 p-5"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -72,7 +72,7 @@ export default function TeamPage() {
                       fill
                       className="object-cover"
                       sizes="48px"
-                      quality={70}
+                      quality={50}
                     />
                   ) : (
                     member.avatar

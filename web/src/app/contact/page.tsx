@@ -94,7 +94,7 @@ export default function ContactPage() {
         {channels.map((channel) => (
           <a
             key={channel.label}
-            className="glass block rounded-2xl border border-white/10 p-5 transition-transform duration-200 hover:border-white/30 hover:-translate-y-1"
+            className="glass block rounded-2xl border border-white/10 p-5"
             href={channel.href}
             target={channel.href.startsWith("http") ? "_blank" : undefined}
             rel="noreferrer"

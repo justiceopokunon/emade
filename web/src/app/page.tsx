@@ -191,8 +191,8 @@ export default function Home() {
                   alt="Community education illustration"
                   fill
                   className="object-cover"
-                  sizes="100vw"
-                  unoptimized
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  loading="lazy"
                 />
               </div>
               <div className="chip w-fit bg-white/10 text-lime-200">Field notes + workshops</div>

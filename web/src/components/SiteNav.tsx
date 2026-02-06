@@ -98,6 +98,7 @@ export function SiteNav() {
             width={60}
             height={60}
             className="object-contain drop-shadow-[0_12px_30px_rgba(158,240,26,0.45)] saturate-150"
+            priority
           />
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-slate-300">{siteTagline}</p>

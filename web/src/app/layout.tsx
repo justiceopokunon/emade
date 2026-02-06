@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SiteNav } from "@/components/SiteNav";
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 const siteName = process.env.NEXT_PUBLIC_SITE_NAME ?? "E-MADE";
 const siteDescription =
@@ -104,14 +111,16 @@ export default function RootLayout({
   };
   
   return (
-    <html lang="en" className={`${envClass} dark`} suppressHydrationWarning>
+    <html lang="en" className={`${envClass} dark ${inter.variable}`} suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="antialiased min-h-screen bg-surface text-foreground">
+      <body className="antialiased min-h-screen bg-surface text-foreground font-sans">
         <ThemeProvider>
           <div className="noise-overlay" aria-hidden />
           <div className="grid-overlay" aria-hidden />

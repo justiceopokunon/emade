@@ -1,0 +1,47 @@
+[
+  {
+    "name": "Battery safety drop-off kit",
+    "difficulty": "Starter",
+    "time": "40 minutes",
+    "outcome": "Build a simple, safe bin for household battery collection and transport.",
+    "status": "published",
+    "imageUrl": "/uploads/battery-safety-kit.png",
+    "steps": [
+      "Line a sturdy plastic container with a non-conductive liner and add a lid.",
+      "Tape battery terminals, separate damaged cells in a sand-filled pouch, and label hazards.",
+      "Post pickup instructions and deliver to a certified drop-off partner weekly."
+    ],
+    "impact": "Prevents fires, chemical exposure, and unsafe household disposal.",
+    "pdfUrl": "/pdfs/solar-thrift-lantern.pdf"
+  },
+  {
+    "name": "Device wipe & reset station",
+    "difficulty": "Starter",
+    "time": "60 minutes",
+    "outcome": "Set up a public table that helps families wipe devices before donating.",
+    "status": "published",
+    "imageUrl": "/uploads/device-wiping.png",
+    "steps": [
+      "Print quick-start wipe cards for common phones, laptops, and tablets.",
+      "Provide USB wipes, cable adapters, and a checklist to remove SIM/SD cards.",
+      "Tag devices as donated or recycle-only and route to a partner org."
+    ],
+    "impact": "Protects privacy and improves safe reuse pathways.",
+    "pdfUrl": "/pdfs/mesh-node-lunchbox.pdf"
+  },
+  {
+    "name": "Home e-waste sorting station",
+    "difficulty": "Builder",
+    "time": "35 minutes",
+    "outcome": "Create a labeled sorting area so families separate devices safely.",
+    "status": "published",
+    "imageUrl": "/uploads/safe-sorting-bin.png",
+    "steps": [
+      "Set up labeled bins: batteries, small devices, cords, and hazardous items.",
+      "Add a printed decision guide for repair vs. recycle and a drop-off schedule.",
+      "Keep a simple log to track what leaves the home and where it goes."
+    ],
+    "impact": "Reduces unsafe mixing and makes recycling follow-through easier.",
+    "pdfUrl": "/pdfs/air-quality-kiosk.pdf"
+  }
+]

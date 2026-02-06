@@ -1,0 +1,239 @@
+{
+  "siteName": "E-MADE",
+  "siteTagline": "Reduce. Reuse. Recycle",
+  "heroMessage": "E-MADE transforms electronic waste into opportunity — responsible recycling, repair, and community-led innovation that protects health and creates green jobs.",
+  "stats": [
+    {
+      "label": "Neighbors trained",
+      "value": "18.4k",
+      "detail": "People who received safety, data wipe, and drop-off guidance"
+    },
+    {
+      "label": "Safe drop-offs guided",
+      "value": "3,120+",
+      "detail": "Batteries and devices routed to verified recyclers"
+    },
+    {
+      "label": "Students trained",
+      "value": "100",
+      "detail": "Youth learning e-waste safety, repair basics, and reuse ethics"
+    }
+  ],
+  "teamMembers": [
+    {
+      "name": "VrØon Tetteh",
+      "role": "Public Relations Lead ",
+      "focus": "Exposure reduction, safe handling training, and justice-first outreach",
+      "avatar": "VT",
+      "imageUrl": "",
+      "socials": [
+        {
+          "label": "Email",
+          "url": "mailto:dukedetainrules@gmail.com"
+        }
+      ]
+    },
+    {
+      "name": "Justice Opoku Nontwiri",
+      "role": "Technologist & AI Developer",
+      "focus": "AI, web development, and robotics projects that empower African communities",
+      "avatar": "JN",
+      "imageUrl": "https://justiceopokunon.github.io/DSC_2866_Original.jpeg",
+      "socials": [
+        {
+          "label": "LinkedIn",
+          "url": "https://www.linkedin.com/in/justiceopokunon"
+        },
+        {
+          "label": "GitHub",
+          "url": "https://github.com/justiceopokunon"
+        },
+        {
+          "label": "Email",
+          "url": "mailto:justiceopokunon@gmail.com"
+        },
+        {
+          "label": "X",
+          "url": "https://twitter.com/justiceopokunon"
+        },
+        {
+          "label": "Instagram",
+          "url": "https://www.instagram.com/iam.just.ice"
+        }
+      ]
+    },
+    {
+      "name": "Adom Brobbey",
+      "role": "Photography and Video Editing ",
+      "focus": "Human-first materials, accessibility, and community learning design",
+      "avatar": "AB",
+      "imageUrl": "",
+      "socials": [
+        {
+          "label": "Email",
+          "url": "mailto:adombrobbey@gmail.com"
+        }
+      ]
+    },
+    {
+      "name": "Kingsford Addo-Brown",
+      "role": "Field Organizer",
+      "focus": "Community collection drives and certified recycler partnerships",
+      "avatar": "KB",
+      "imageUrl": "",
+      "socials": [
+        {
+          "label": "Email",
+          "url": "mailto:makibrown101@gmail.com"
+        }
+      ]
+    },
+    {
+      "name": "Joseph-Henry Attigah",
+      "role": "Role",
+      "focus": "",
+      "avatar": "JA",
+      "imageUrl": "",
+      "socials": [
+        {
+          "label": "Email",
+          "url": "mailto:brainwork.preseclegon@gmail.com"
+        }
+      ]
+    }
+  ],
+  "contactChannels": [
+    {
+      "label": "Partnerships",
+      "detail": "admin@emade.social",
+      "href": "mailto:admin@emade.social"
+    },
+    {
+      "label": "Press",
+      "detail": "admin@emade.social",
+      "href": "mailto:admin@emade.social"
+    },
+    {
+      "label": "Community",
+      "detail": "Report unsafe dumping and request a workshop.",
+      "href": "/stories"
+    },
+    {
+      "label": "Learning guides",
+      "detail": "Free PDFs on safe handling and responsible recycling.",
+      "href": "/diy"
+    }
+  ],
+  "ewasteImages": [
+    "/uploads/battery-safety-kit.png",
+    "/uploads/ewaste-bin.jpg",
+    "/uploads/device-wiping.png",
+    "/uploads/safe-sorting-bin.png",
+    "/uploads/recycling-old-laptops.jpg"
+  ],
+  "storyImages": [
+    "/uploads/IMG_4707.jpeg",
+    "/uploads/IMG_4708.jpeg",
+    "/uploads/IMG_4748.png",
+    "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=800",
+    "https://images.unsplash.com/photo-1624508357165-87a393e91cee?w=800"
+  ],
+  "navItems": [
+    {
+      "label": "Forum & Stories",
+      "href": "/stories"
+    },
+    {
+      "label": "Learning Guides",
+      "href": "/diy"
+    },
+    {
+      "label": "Gallery",
+      "href": "/gallery"
+    },
+    {
+      "label": "Team",
+      "href": "/team"
+    },
+    {
+      "label": "Contact",
+      "href": "/contact"
+    }
+  ],
+  "submitCta": {
+    "title": "Share your local safety tip",
+    "description": "Have a workshop idea, safety checklist, or community story? We feature community-led solutions and credit local groups.",
+    "email": "admin@emade.social",
+    "buttonText": "Send a tip"
+  },
+  "galleryContent": {
+    "hero": {
+      "eyebrow": "Field archive",
+      "title": "Community safety gallery",
+      "description": "A visual library of local workshops, safe handling setups, and community learning in motion."
+    },
+    "sections": [
+      {
+        "id": "ewaste",
+        "eyebrow": "E-waste scenes",
+        "title": "Impact & context",
+        "description": "Document e-waste realities, safety moments, and on-the-ground context."
+      },
+      {
+        "id": "story-slides",
+        "eyebrow": "Community stories",
+        "title": "Story highlights",
+        "description": "Spotlight breakthroughs, lessons, and forums worth revisiting."
+      },
+      {
+        "id": "story-covers",
+        "eyebrow": "Story covers",
+        "title": "Featured stories",
+        "description": "Auto-filled from published stories and moderation-approved posts."
+      },
+      {
+        "id": "diy-covers",
+        "eyebrow": "Playbook covers",
+        "title": "DIY safety playbooks",
+        "description": "Auto-filled from DIY builds and printable learning kits."
+      }
+    ]
+  },
+  "galleryTiles": [
+    {
+      "id": "tile-field-kit",
+      "title": "Battery triage bench",
+      "description": "Emergency bins, tape, and safety notes used at pop-up clinics.",
+      "src": "/images/Emergency bins, tape, and safety notes used at pop-up clinics.png",
+      "size": "spotlight"
+    },
+    {
+      "id": "tile-community-map",
+      "title": "Community recycler map",
+      "description": "Printed drop-off map that lives on every workshop table.",
+      "src": "/images/Printed drop-off map that lives on every workshop table.png",
+      "size": "landscape"
+    },
+    {
+      "id": "tile-safe-sort",
+      "title": "Safe sorting bins",
+      "description": "Household station built from recycled crates and sand buckets.",
+      "src": "/uploads/safe-sorting-bin.png",
+      "size": "portrait"
+    },
+    {
+      "id": "tile-data-wipe",
+      "title": "Data wipe checklist",
+      "description": "Step cards laminated for wipe clinics and public libraries.",
+      "src": "/images/device wiping.png",
+      "size": "square"
+    },
+    {
+      "id": "tile-youth-lab",
+      "title": "Youth repair lab",
+      "description": "Teens cataloguing chargers and labeling hazardous cells.",
+      "src": "/images/hero-education.svg",
+      "size": "landscape"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "title": "What e-waste does to air, water, and workers",
+    "slug": "what-e-waste-does-to-air-water-and-workers",
+    "category": "Learning",
+    "excerpt": "A community teach-in mapped how informal burning and acid baths harm lungs, soil, and livelihoods.",
+    "body": "Residents documented smoke patterns near dump sites, mapped wind directions, and logged which days burning was most frequent. Facilitators explained which components release toxic fumes when heated and how acids leach into groundwater, tying each hazard to visible symptoms people already felt at home.\n\nThe group collected water samples from wells and drainage canals and compared them to safe-handling guidance. Stories from workers and caregivers grounded the conversation in lived reality, and a health worker outlined immediate steps for reducing exposure—masking, avoiding open-air burning, and segregating batteries and circuit boards.\n\nThe session ended with a neighborhood plan: a phone tree for safe drop-off referrals, a public map of certified recyclers, and a monthly teach-in to track progress. Several families committed to host sorting stations and to report illegal dumping through the hotline.",
+    "author": "Amina Patel",
+    "time": "7 min read",
+    "status": "active",
+    "imageUrl": "/uploads/IMG_4748.png",
+    "tags": [
+      "health",
+      "awareness",
+      "community"
+    ]
+  },
+  {
+    "title": "Data wiping and donation ethics",
+    "slug": "data-wiping-and-donation-ethics",
+    "category": "Guide",
+    "excerpt": "A step-by-step workshop helped families wipe devices safely before donating or recycling.",
+    "body": "The workshop opened with a simple truth: deleting files is not the same as removing data. Facilitators demonstrated the difference between factory reset, secure erase, and full disk encryption, and explained why SIM/SD cards can still expose personal information if left inside devices.\n\nParticipants practiced a step-by-step wipe flow for phones, laptops, and tablets, using a checklist that includes account sign-out, device encryption, and proof-of-wipe documentation. Donation centers shared what they need to accept devices safely—clear labels, device condition notes, and batteries removed or taped.\n\nThe group also covered when not to donate: swollen batteries, cracked screens with exposed cells, water damage, or unknown provenance. Every attendee left with a vetted list of certified e-waste partners and a printable card to post at community drop-offs.",
+    "author": "Diego Chen",
+    "time": "5 min read",
+    "status": "active",
+    "imageUrl": "/uploads/device-wiping.png",
+    "tags": [
+      "privacy",
+      "safety",
+      "education"
+    ]
+  },
+  {
+    "title": "Battery safety: what never to open",
+    "slug": "battery-safety-what-never-to-open",
+    "category": "Safety",
+    "excerpt": "A safety circle  ",
+    "body": "The safety circle began with real examples of damaged batteries and what to look for: swelling, punctures, leaks, and unusual heat. Participants learned how lithium cells behave under pressure and why even small punctures can trigger fires or toxic smoke.\n\nHands-on practice followed: taping battery terminals, isolating damaged cells in sand-filled containers, and labeling hazards clearly for transport. A short role-play demonstrated how to explain risks to neighbors without shaming and how to document incidents for local health teams.\n\nThe takeaway was clear: never open or crush lithium cells at home, and never toss them in household trash. The group compiled a shared list of drop-off points and scheduled a quarterly collection day with a certified recycler.",
+    "author": "Salvador Nnadozie",
+    "time": "4 min read",
+    "status": "active",
+    "imageUrl": "/uploads/Battery safety.png",
+    "tags": [
+      "battery",
+      "hazard",
+      "care"
+    ]
+  }
+]

@@ -158,7 +158,9 @@ export default async function Home() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 80vw"
-                quality={50}
+                quality={35}
+                priority
+                fetchPriority="high"
               />
             ) : null}
           </div>
@@ -175,7 +177,7 @@ export default async function Home() {
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={50}
+                        quality={35}
                       />
                     </div>
                   )}
@@ -197,7 +199,7 @@ export default async function Home() {
               <p className="text-xs uppercase tracking-[0.28em] text-slate-300">Community signals</p>
               <h2 className="text-3xl font-semibold text-white sm:text-4xl">Stories, safety tips, and local action</h2>
             </div>
-            <Link className="btn-ghost transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]" href="/stories">
+            <Link className="btn-ghost" href="/stories">
               Visit the forum
             </Link>
           </div>
@@ -209,7 +211,9 @@ export default async function Home() {
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 80vw"
-                quality={50}
+                quality={35}
+                priority
+                fetchPriority="high"
               />
             ) : null}
           </div>
@@ -226,7 +230,7 @@ export default async function Home() {
                           fill
                           className="object-cover"
                           sizes="(max-width: 768px) 100vw, 33vw"
-                          quality={50}
+                          quality={35}
                         />
                       </div>
                     )}

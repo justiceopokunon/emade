@@ -79,7 +79,7 @@ export default function DiyPage() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    quality={50}
+                    quality={35}
                   />
                 </div>
               )}

@@ -21,8 +21,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ['framer-motion', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+    optimizePackageImports: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'lucide-react'],
   },
 };
-
 export default nextConfig;

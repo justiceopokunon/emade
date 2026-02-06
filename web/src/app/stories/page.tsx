@@ -87,7 +87,9 @@ export default function StoriesPage() {
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 80vw"
-            quality={70}
+            quality={35}
+            priority
+            fetchPriority="high"
           />
         ) : null}
       </div>
@@ -106,7 +108,7 @@ export default function StoriesPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  quality={50}
+                  quality={35}
                 />
               </div>
             )}

@@ -52,6 +52,8 @@ export default async function Home() {
     ? siteData.storyImages
     : defaultStoryImages;
   const submitCta = { ...defaultSubmitCta, ...(siteData.submitCta ?? {}) };
+  const ewasteHero = ewasteImages[0];
+  const storyHero = storyImages[0];
 
   return (
     <div className="relative z-10 flex min-h-screen flex-col px-4 pb-16 pt-8 sm:px-8 sm:pt-10 lg:px-16">
@@ -104,7 +106,7 @@ export default async function Home() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 600px"
-                    loading="lazy"
+                    priority
                   />
                 </div>
                 <div className="space-y-4 text-sm text-slate-200">
@@ -149,9 +151,16 @@ export default async function Home() {
             </Link>
           </div>
           <div className="slideshow relative h-48 w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 sm:h-56 lg:h-64">
-            {ewasteImages.map((src) => (
-              <img key={src} src={src} alt="E-waste education" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
-            ))}
+            {ewasteHero ? (
+              <Image
+                src={ewasteHero}
+                alt="E-waste education"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 80vw"
+                quality={70}
+              />
+            ) : null}
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {projects.map((project) => (
@@ -160,12 +169,13 @@ export default async function Home() {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                   {project.imageUrl && (
                     <div className="relative mb-3 h-36 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-900/50">
-                      <img
+                      <Image
                         src={project.imageUrl}
                         alt={`${project.name} guide cover`}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                        decoding="async"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        quality={70}
                       />
                     </div>
                   )}
@@ -192,9 +202,16 @@ export default async function Home() {
             </Link>
           </div>
           <div className="slideshow relative h-48 w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 sm:h-56 lg:h-64">
-            {storyImages.map((src) => (
-              <img key={src} src={src} alt="Story highlights" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
-            ))}
+            {storyHero ? (
+              <Image
+                src={storyHero}
+                alt="Story highlights"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 80vw"
+                quality={70}
+              />
+            ) : null}
           </div>
           <div className="grid gap-5 md:grid-cols-3">
             {storyList.slice(0, 3).map((story) => (
@@ -203,12 +220,13 @@ export default async function Home() {
                   <div className="space-y-3">
                     {story.imageUrl && (
                       <div className="relative h-36 w-full overflow-hidden rounded-xl border border-white/10 bg-slate-900/50">
-                        <img
+                        <Image
                           src={story.imageUrl}
                           alt={`${story.title} cover`}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          decoding="async"
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          quality={70}
                         />
                       </div>
                     )}

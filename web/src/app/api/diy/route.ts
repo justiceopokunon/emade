@@ -3,7 +3,9 @@ import path from "path";
 import { promises as fs } from "fs";
 import { diyProjects as defaultProjects } from "@/lib/data";
 
-const dataDir = path.join(process.cwd(), "data");
+// Use /tmp in serverless, data/ locally
+const isProduction = process.env.VERCEL === '1';
+const dataDir = isProduction ? '/tmp/data' : path.join(process.cwd(), "data");
 const filePath = path.join(dataDir, "diy.json");
 
 async function readData() {
@@ -21,11 +23,19 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  if (!Array.isArray(body)) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  try {
+    const body = await request.json();
+    if (!Array.isArray(body)) {
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    }
+    await fs.mkdir(dataDir, { recursive: true });
+    await fs.writeFile(filePath, JSON.stringify(body, null, 2), "utf8");
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('Save error:', error);
+    return NextResponse.json(
+      { error: 'Failed to save DIY data', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
   }
-  await fs.mkdir(dataDir, { recursive: true });
-  await fs.writeFile(filePath, JSON.stringify(body, null, 2), "utf8");
-  return NextResponse.json({ ok: true });
 }

@@ -284,6 +284,11 @@ export const adminPanels = [
 
 export const contactChannels = [
   {
+    label: "Instagram",
+    detail: "@emade.social - Follow for updates, tips & stories",
+    href: "https://instagram.com/emade.social",
+  },
+  {
     label: "Partnerships",
     detail: "admin@emade.social",
     href: "mailto:admin@emade.social",

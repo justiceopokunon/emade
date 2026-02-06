@@ -1,7 +1,6 @@
 "use client";
 
 import { teamMembers } from "@/lib/data";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -51,33 +50,29 @@ export default function TeamPage() {
           alt="Illustration of e-waste stewardship"
           fill
           className="object-cover"
-          sizes="100vw"
-          unoptimized
-          loading="lazy"
+          sizes="(max-width: 768px) 100vw, 80vw"
+          priority
         />
       </div>
 
       <ScrollLoad minHeight={360}>
       <div className="grid gap-6 sm:grid-cols-2">
-        {members.map((member, idx) => (
-          <motion.div
+        {members.map((member) => (
+          <div
             key={member.name}
-            className="glass relative rounded-3xl border border-white/10 p-5"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: idx * 0.05, ease: "easeOut" }}
-            whileHover={{ y: -6, scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
+            className="glass relative rounded-3xl border border-white/10 p-5 transition-transform duration-200 hover:-translate-y-1"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-lime-300/60 via-purple-500/40 to-emerald-400/50 text-sm font-semibold text-white">
                   {member.imageUrl ? (
-                    <img
+                    <Image
                       src={member.imageUrl}
                       alt={member.name}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                      quality={70}
                     />
                   ) : (
                     member.avatar
@@ -106,7 +101,7 @@ export default function TeamPage() {
                 </a>
               ))}
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
       </ScrollLoad>

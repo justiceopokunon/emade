@@ -1,15 +1,10 @@
 "use client";
 
 import { stories, storyImages as defaultStoryImages } from "@/lib/data";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-const variants = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-};
 
 export default function StoriesPage() {
   const [storyList, setStoryList] = useState(stories);
@@ -21,6 +16,7 @@ export default function StoriesPage() {
   const getStorySlug = (story: { title?: string; slug?: string }) =>
     slugify((story.slug || story.title || "").trim());
   const [storyImages, setStoryImages] = useState(defaultStoryImages);
+  const storyHero = storyImages[0];
 
   useEffect(() => {
     let active = true;
@@ -78,36 +74,39 @@ export default function StoriesPage() {
           alt="Community learning stories illustration"
           fill
           className="object-cover"
-          sizes="100vw"
-          unoptimized
+          sizes="(max-width: 768px) 100vw, 80vw"
+          priority
         />
       </div>
 
       <div className="slideshow relative h-48 w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 sm:h-56 lg:h-64">
-        {storyImages.map((src) => (
-          <img key={src} src={src} alt="Story highlights" loading="lazy" />
-        ))}
+        {storyHero ? (
+          <Image
+            src={storyHero}
+            alt="Story highlights"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 80vw"
+            quality={70}
+          />
+        ) : null}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {storyList.map((story, idx) => (
-          <motion.article
+        {storyList.map((story) => (
+          <article
             key={story.title}
-            className="glass relative flex h-full flex-col gap-3 rounded-2xl border border-white/10 p-5"
-            variants={variants}
-            initial="initial"
-            animate="animate"
-            transition={{ duration: 0.4, delay: idx * 0.05, ease: "easeOut" }}
-            whileHover={{ y: -6, scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
+            className="glass relative flex h-full flex-col gap-3 rounded-2xl border border-white/10 p-5 transition-transform duration-200 hover:-translate-y-1"
           >
             {story.imageUrl && (
               <div className="relative h-36 w-full overflow-hidden rounded-xl border border-white/10">
-                <img
+                <Image
                   src={story.imageUrl}
                   alt={`${story.title} cover`}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  quality={70}
                 />
               </div>
             )}
@@ -141,7 +140,7 @@ export default function StoriesPage() {
                 Read full story
               </Link>
             </div>
-          </motion.article>
+          </article>
         ))}
       </div>
     </div>

@@ -28,6 +28,8 @@ const tileSizeClasses: Record<string, string> = {
   spotlight: "col-span-2 row-span-2",
 };
 
+const isRemote = (src: string) => /^https?:\/\//.test(src);
+
 export default function GalleryPage() {
   const [galleryContent, setGalleryContent] = useState(defaultGalleryContent);
   const [galleryTiles, setGalleryTiles] = useState(defaultGalleryTiles);
@@ -154,7 +156,25 @@ export default function GalleryPage() {
                   }`}
               >
                 {tile.src ? (
-                  <img src={tile.src} alt={tile.title || "Gallery tile"} className="h-full w-full object-cover" loading="lazy" />
+                  isRemote(tile.src) ? (
+                    <img
+                      src={tile.src}
+                      alt={tile.title || "Gallery tile"}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                      width={800}
+                      height={800}
+                    />
+                  ) : (
+                    <Image
+                      src={tile.src}
+                      alt={tile.title || "Gallery tile"}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      quality={70}
+                    />
+                  )
                 ) : (
                   <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.3em] text-slate-500">
                     Awaiting image
@@ -191,8 +211,12 @@ export default function GalleryPage() {
         <ScrollLoad minHeight={360}>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ewasteSlides.map((src) => (
-            <div key={src} className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-              <img src={src} alt="E-waste context" className="h-48 w-full object-cover" loading="lazy" />
+            <div key={src} className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 h-48">
+              {isRemote(src) ? (
+                <img src={src} alt="E-waste context" className="h-full w-full object-cover" loading="lazy" width={800} height={480} />
+              ) : (
+                <Image src={src} alt="E-waste context" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={70} />
+              )}
             </div>
           ))}
         </div>
@@ -214,8 +238,12 @@ export default function GalleryPage() {
         <ScrollLoad minHeight={360}>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {storySlides.map((src) => (
-            <div key={src} className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-              <img src={src} alt="Story highlight" className="h-48 w-full object-cover" loading="lazy" />
+            <div key={src} className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 h-48">
+              {isRemote(src) ? (
+                <img src={src} alt="Story highlight" className="h-full w-full object-cover" loading="lazy" width={800} height={480} />
+              ) : (
+                <Image src={src} alt="Story highlight" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={70} />
+              )}
             </div>
           ))}
         </div>
@@ -237,8 +265,12 @@ export default function GalleryPage() {
         <ScrollLoad minHeight={360}>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {storyCovers.map((src) => (
-            <div key={src} className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-              <img src={src} alt="Story cover" className="h-48 w-full object-cover" loading="lazy" />
+            <div key={src} className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 h-48">
+              {isRemote(src) ? (
+                <img src={src} alt="Story cover" className="h-full w-full object-cover" loading="lazy" width={800} height={480} />
+              ) : (
+                <Image src={src} alt="Story cover" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={70} />
+              )}
             </div>
           ))}
         </div>
@@ -260,8 +292,12 @@ export default function GalleryPage() {
         <ScrollLoad minHeight={360}>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {diyCovers.map((src) => (
-            <div key={src} className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-              <img src={src} alt="Guide cover" className="h-48 w-full object-cover" loading="lazy" />
+            <div key={src} className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 h-48">
+              {isRemote(src) ? (
+                <img src={src} alt="Guide cover" className="h-full w-full object-cover" loading="lazy" width={800} height={480} />
+              ) : (
+                <Image src={src} alt="Guide cover" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" quality={70} />
+              )}
             </div>
           ))}
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { stories as fallbackStories } from "@/lib/data";
@@ -105,11 +105,8 @@ export default function StoryDetailPage() {
         Back to community stories
       </Link>
 
-      <motion.article
+      <article
         className="glass relative overflow-hidden rounded-3xl border border-white/10 p-6 sm:p-8"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.2em] text-lime-200">
           <span>{story.category}</span>
@@ -126,12 +123,15 @@ export default function StoryDetailPage() {
         <p className="mt-3 text-lg text-slate-200">{story.excerpt}</p>
 
         {story.imageUrl && (
-          <div className="mt-6 h-56 w-full overflow-hidden rounded-2xl border border-white/10">
-            <img
+          <div className="relative mt-6 h-56 w-full overflow-hidden rounded-2xl border border-white/10">
+            <Image
               src={story.imageUrl}
               alt={`${story.title} cover`}
-              className="h-full w-full object-cover"
-              loading="lazy"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 60vw"
+              quality={75}
+              priority
             />
           </div>
         )}
@@ -160,7 +160,7 @@ export default function StoryDetailPage() {
             More stories
           </Link>
         </div>
-      </motion.article>
+      </article>
 
       <section className="glass rounded-3xl border border-white/10 p-6">
         <div className="flex flex-wrap items-center justify-between gap-2">

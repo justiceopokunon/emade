@@ -2,7 +2,6 @@
 
 import { contactChannels } from "@/lib/data";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ScrollLoad } from "@/components/ScrollLoad";
@@ -92,23 +91,18 @@ export default function ContactPage() {
 
       <ScrollLoad minHeight={320}>
       <div className="grid gap-5 sm:grid-cols-2">
-        {channels.map((channel, idx) => (
-          <motion.a
+        {channels.map((channel) => (
+          <a
             key={channel.label}
-            className="glass block rounded-2xl border border-white/10 p-5 hover:border-white/30"
+            className="glass block rounded-2xl border border-white/10 p-5 transition-transform duration-200 hover:border-white/30 hover:-translate-y-1"
             href={channel.href}
             target={channel.href.startsWith("http") ? "_blank" : undefined}
             rel="noreferrer"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: idx * 0.05, ease: "easeOut" }}
-            whileHover={{ y: -6, scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
           >
             <p className="text-sm uppercase tracking-[0.25em] text-lime-200">{channel.label}</p>
             <p className="mt-2 text-lg font-semibold text-white">{channel.detail}</p>
             <p className="mt-2 text-sm text-slate-300">PDFs and responses are free; no paywalls, no surprises.</p>
-          </motion.a>
+          </a>
         ))}
       </div>
       </ScrollLoad>

@@ -1,16 +1,11 @@
 "use client";
 
 import { diyProjects } from "@/lib/data";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ScrollLoad } from "@/components/ScrollLoad";
 
-const fade = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 },
-};
 
 export default function DiyPage() {
   const [projects, setProjects] = useState(diyProjects);
@@ -61,34 +56,30 @@ export default function DiyPage() {
             alt="E-waste sorting and recycling illustration"
             fill
             className="object-cover"
-            sizes="100vw"
-            unoptimized
+            sizes="(max-width: 768px) 100vw, 80vw"
+            priority
           />
         </div>
       </ScrollLoad>
 
       <ScrollLoad minHeight={400}>
       <div className="grid gap-6 lg:grid-cols-2">
-        {projects.map((project, idx) => (
-          <motion.div
+        {projects.map((project) => (
+          <div
             key={project.name}
-            className="glass relative overflow-hidden rounded-3xl border border-white/10 p-6"
-            variants={fade}
-            initial="initial"
-            animate="animate"
-            transition={{ duration: 0.45, delay: idx * 0.06, ease: "easeOut" }}
-            whileHover={{ y: -6, scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
+            className="glass relative overflow-hidden rounded-3xl border border-white/10 p-6 transition-transform duration-200 hover:-translate-y-1"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-emerald-400/5" />
             <div className="relative space-y-3">
               {project.imageUrl && (
                 <div className="relative h-40 w-full overflow-hidden rounded-2xl border border-white/10">
-                  <img
+                  <Image
                     src={project.imageUrl}
                     alt={`${project.name} guide cover`}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    quality={70}
                   />
                 </div>
               )}
@@ -134,7 +125,7 @@ export default function DiyPage() {
                 </a>
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
       </ScrollLoad>

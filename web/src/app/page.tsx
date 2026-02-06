@@ -21,8 +21,8 @@ type SiteData = {
 const heroFallback =
   "E-MADE transforms electronic waste into opportunity — collecting, repairing, and responsibly recycling devices while training communities and creating green pathways for youth.";
 
-const getApiBase = () => {
-  const host = headers().get("host");
+const getApiBase = async () => {
+  const host = (await headers()).get("host");
   if (!host) return "https://emade.social";
   const protocol = process.env.VERCEL ? "https" : "http";
   return `${protocol}://${host}`;
@@ -39,7 +39,7 @@ const fetchJson = async <T,>(url: string, fallback: T): Promise<T> => {
 };
 
 export default async function Home() {
-  const apiBase = getApiBase();
+  const apiBase = await getApiBase();
   const siteData = await fetchJson<SiteData>(`${apiBase}/api/site`, {} as SiteData);
   const storyList = await fetchJson<typeof stories>(`${apiBase}/api/stories`, stories);
   const projects = await fetchJson<typeof diyProjects>(`${apiBase}/api/diy`, diyProjects);

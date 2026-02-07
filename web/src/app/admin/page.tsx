@@ -124,6 +124,7 @@ export default function AdminPage() {
   const [navStatus, setNavStatus] = useState("");
   const [galleryStatus, setGalleryStatus] = useState("");
   const [galleryTilesStatus, setGalleryTilesStatus] = useState("");
+  const [analytics, setAnalytics] = useState<any>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewSection, setPreviewSection] = useState("");
   const [cropModalOpen, setCropModalOpen] = useState(false);
@@ -247,6 +248,26 @@ export default function AdminPage() {
     setActiveSection(id);
     node.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  const loadAnalytics = async () => {
+    try {
+      const res = await fetch("/api/analytics", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setAnalytics(data);
+      }
+    } catch {
+      // Silent fail
+    }
+  };
+
+  useEffect(() => {
+    if (authed) {
+      loadAnalytics();
+      const interval = setInterval(loadAnalytics, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [authed]);
 
   const handleSectionNav = (id: string) => {
     scrollToSection(id);
@@ -936,6 +957,120 @@ export default function AdminPage() {
           )}
           <div className="flex flex-col gap-6">
             <div className="flex-1 space-y-8">
+
+          <section id="analytics" className="glass rounded-3xl border border-lime-400/20 p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.28em] text-lime-300">Real-time metrics</p>
+                <h3 className="text-2xl font-semibold text-white">📊 Community analytics</h3>
+              </div>
+              <button type="button" className="btn-ghost" onClick={loadAnalytics}>
+                Refresh data
+              </button>
+            </div>
+
+            {!analytics ? (
+              <div className="mt-4 flex items-center justify-center py-8">
+                <span className="text-sm text-slate-400">Loading analytics...</span>
+              </div>
+            ) : (
+              <div className="mt-6 space-y-6">
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Total stories</p>
+                    <p className="mt-2 text-3xl font-bold text-white">{analytics.totalStories}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Chat messages</p>
+                    <p className="mt-2 text-3xl font-bold text-white">{analytics.totalChats}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">DIY projects</p>
+                    <p className="mt-2 text-3xl font-bold text-white">{analytics.totalDiyProjects}</p>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">
+                    Engagement metrics
+                  </h4>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                    <div>
+                      <p className="text-xs text-slate-400">Total reactions</p>
+                      <p className="mt-1 text-2xl font-semibold text-lime-300">
+                        {analytics.engagement?.totalReactions || 0}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400">Avg messages/story</p>
+                      <p className="mt-1 text-2xl font-semibold text-lime-300">
+                        {analytics.engagement?.avgMessagesPerStory || 0}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400">Active discussions</p>
+                      <p className="mt-1 text-2xl font-semibold text-lime-300">
+                        {analytics.engagement?.activeDiscussions || 0}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">
+                    Top stories by engagement
+                  </h4>
+                  <div className="mt-3 space-y-2">
+                    {analytics.topStories?.slice(0, 5).map((story: any, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-3 py-2">
+                        <span className="text-sm text-slate-200">{story.title}</span>
+                        <span className="chip bg-lime-400/10 text-xs text-lime-300">
+                          {story.chatCount} messages
+                        </span>
+                      </div>
+                    ))}
+                    {(!analytics.topStories || analytics.topStories.length === 0) && (
+                      <p className="text-xs text-slate-400">No discussions yet</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">
+                    Sentiment breakdown
+                  </h4>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-green-400"></div>
+                      <span className="text-xs text-slate-400">Positive</span>
+                      <span className="ml-auto text-sm font-semibold text-white">
+                        {analytics.sentimentBreakdown?.positive || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-yellow-400"></div>
+                      <span className="text-xs text-slate-400">Neutral</span>
+                      <span className="ml-auto text-sm font-semibold text-white">
+                        {analytics.sentimentBreakdown?.neutral || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-red-400"></div>
+                      <span className="text-xs text-slate-400">Negative</span>
+                      <span className="ml-auto text-sm font-semibold text-white">
+                        {analytics.sentimentBreakdown?.negative || 0}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-400">
+                  Auto-refreshes every 30 seconds. Use this data to identify trending topics and community needs.
+                </p>
+              </div>
+            )}
+          </section>
+
           <section id="gallery" className="glass rounded-3xl border border-white/10 p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>

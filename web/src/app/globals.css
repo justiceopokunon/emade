@@ -59,11 +59,19 @@
   min-width: 0;
 }
 
+html {
+  /* Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 body {
   background: var(--surface);
   color: var(--foreground);
   min-height: 100vh;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .dark body,
@@ -106,6 +114,9 @@ button {
   pointer-events: none;
   mix-blend-mode: soft-light;
   z-index: 1;
+  /* GPU acceleration */
+  will-change: opacity;
+  transform: translateZ(0);
 }
 
 .light .noise-overlay {
@@ -128,6 +139,9 @@ button {
   mask-image: radial-gradient(circle at center, black, transparent 65%);
   pointer-events: none;
   z-index: 1;
+  /* GPU acceleration */
+  will-change: opacity;
+  transform: translateZ(0);
 }
 
 .light .grid-overlay {

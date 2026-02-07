@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { promises as fs } from "fs";
 import path from "path";
+import { put } from "@vercel/blob";
 import { slugify } from "@/lib/gemini";
 
 export async function POST(request: Request) {
@@ -49,11 +50,32 @@ export async function POST(request: Request) {
 
   const pdfBytes = await pdfDoc.save();
   const fileName = `story-${slugify(title)}-${Date.now()}.pdf`;
+  const isProduction = process.env.VERCEL === "1";
+  const hasBlobStorage = !!process.env.BLOB_READ_WRITE_TOKEN;
+  const inlineUrl = `data:application/pdf;base64,${Buffer.from(pdfBytes).toString("base64")}`;
+
+  if (hasBlobStorage) {
+    const blob = await put(`pdfs/${fileName}`, Buffer.from(pdfBytes), {
+      access: "public",
+      contentType: "application/pdf",
+    });
+    return NextResponse.json({ url: blob.url, storage: "blob" });
+  }
+
+  if (isProduction && !hasBlobStorage) {
+    return NextResponse.json({
+      storage: "inline",
+      downloadUrl: inlineUrl,
+      fileName,
+      warning: "Vercel Blob Storage missing. Enable BLOB_READ_WRITE_TOKEN for persistent URLs.",
+    });
+  }
+
   const pdfDir = path.join(process.cwd(), "public", "pdfs");
   await fs.mkdir(pdfDir, { recursive: true });
   await fs.writeFile(path.join(pdfDir, fileName), pdfBytes);
 
-  return NextResponse.json({ url: `/pdfs/${fileName}` });
+  return NextResponse.json({ url: `/pdfs/${fileName}`, storage: "filesystem" });
 }
 
 function wrapText(text: string, font: any, size: number, maxWidth: number) {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
-import { isDatabaseConfigured, getDb } from "@/lib/db";
+import { isDatabaseConfigured, getDb, ensureCoreTables } from "@/lib/db";
 import { stories as defaultStories } from "@/lib/data";
 import { handleError } from "@/lib/errorHandler";
 
@@ -20,8 +20,9 @@ async function readDataFromFile() {
 }
 
 async function readDataFromDatabase() {
+  await ensureCoreTables();
   const sql = getDb();
-  const rows = await sql`SELECT slug, title, excerpt, body, author, category, time, status, image_url, tags FROM stories ORDER BY time DESC`;
+  const rows = await sql`SELECT slug, title, excerpt, body, author, category, time, status, image_url, pdf_url, tags FROM stories ORDER BY time DESC`;
   return rows.map((r: any) => ({
     slug: r.slug,
     title: r.title,
@@ -32,6 +33,7 @@ async function readDataFromDatabase() {
     time: r.time,
     status: r.status,
     imageUrl: r.image_url,
+    pdfUrl: r.pdf_url,
     tags: r.tags
   }));
 }
@@ -52,7 +54,8 @@ export async function GET() {
   try {
     const data = await readData();
     const response = NextResponse.json(data);
-    response.headers.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+    response.headers.set("Cache-Control", "no-store, max-age=0");
+    response.headers.set("Pragma", "no-cache");
     return response;
   } catch (error) {
     console.error(error);
@@ -70,6 +73,7 @@ export async function POST(request: Request) {
     // Try database first if configured
     if (isDatabaseConfigured()) {
       try {
+        await ensureCoreTables();
         const sql = getDb();
         
         // Delete all existing stories and reinsert (full replace)
@@ -77,21 +81,25 @@ export async function POST(request: Request) {
         
         for (const story of body) {
           await sql`
-            INSERT INTO stories (slug, title, excerpt, body, author, category, time, status, image_url, tags)
-            VALUES (${story.slug}, ${story.title}, ${story.excerpt || ''}, ${story.body || ''}, ${story.author || 'Anonymous'}, ${story.category || 'General'}, ${story.time}, ${story.status || 'published'}, ${story.imageUrl || ''}, ${story.tags || []})
+            INSERT INTO stories (slug, title, excerpt, body, author, category, time, status, image_url, pdf_url, tags)
+            VALUES (${story.slug}, ${story.title}, ${story.excerpt || ''}, ${story.body || ''}, ${story.author || 'Anonymous'}, ${story.category || 'General'}, ${story.time}, ${story.status || 'published'}, ${story.imageUrl || ''}, ${story.pdfUrl || ''}, ${story.tags || []})
           `;
         }
         
         return NextResponse.json({ ok: true, storage: 'database' });
       } catch (dbError) {
         console.error('Database write failed, attempting file system:', dbError);
-        // Fall through to file system
+        if (isProduction) {
+          return NextResponse.json(
+            { error: 'Database write failed', details: dbError instanceof Error ? dbError.message : 'Unknown error' },
+            { status: 500 }
+          );
+        }
+        // Fall through to file system in development
       }
     }
     
     // File system fallback
-    const isProduction = process.env.VERCEL === "1";
-    
     if (isProduction && !isDatabaseConfigured()) {
       return NextResponse.json(
         { 

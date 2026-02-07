@@ -44,19 +44,26 @@ export function SiteNav() {
       const delta = current - last;
       lastScrollRef.current = current;
 
+      if (current < last) {
+        setIsVisible(true);
+        return;
+      }
+
       if (current <= 120) {
         setIsVisible(true);
         return;
       }
 
-      if (delta > 4) {
+      if (delta > 2) {
         setIsVisible(false);
-      } else if (delta < -1) {
-        setIsVisible(true);
       }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("touchmove", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("touchmove", handleScroll);
+    };
   }, []);
 
   useEffect(() => {

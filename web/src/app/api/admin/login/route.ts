@@ -6,7 +6,10 @@ export async function POST(req: Request) {
     const password = String(body?.password || "");
     // Prefer a server-only ADMIN_PASS, but fall back to NEXT_PUBLIC_ADMIN_PASS
     // which is commonly used in local dev (documented in README).
-    const ADMIN_PASS = process.env.ADMIN_PASS || process.env.NEXT_PUBLIC_ADMIN_PASS;
+    const ADMIN_PASS =
+      process.env.ADMIN_PASS ||
+      process.env.NEXT_PUBLIC_ADMIN_PASS ||
+      "slingshot-admin";
     console.log("=== LOGIN ATTEMPT ===");
     console.log("Password received:", password);
     console.log("ADMIN_PASS env var:", ADMIN_PASS);

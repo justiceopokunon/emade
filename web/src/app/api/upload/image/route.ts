@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
-import { put } from '@vercel/blob';
+import { randomUUID } from "crypto";
+import { put } from "@vercel/blob";
 import { handleError } from "@/lib/errorHandler";
 
 const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
@@ -20,12 +21,17 @@ export async function POST(request: Request) {
     }
 
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+    const extension = path.extname(safeName);
+    const baseName = path.basename(safeName, extension);
+    const uniqueSuffix = `${Date.now()}-${randomUUID()}`;
+    const uniqueName = `${baseName}-${uniqueSuffix}${extension}`;
+    const storageKey = `uploads/${uniqueName}`;
 
     // Try Vercel Blob first if configured
     if (isBlobConfigured()) {
       try {
-        const blob = await put(`uploads/${safeName}`, file, {
-          access: 'public',
+        const blob = await put(storageKey, file, {
+          access: "public",
         });
         return NextResponse.json({ url: blob.url, storage: 'blob' });
       } catch (blobError) {
@@ -52,10 +58,10 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(arrayBuffer);
     const uploadDir = path.join(process.cwd(), "public", "uploads");
     await fs.mkdir(uploadDir, { recursive: true });
-    const targetPath = path.join(uploadDir, safeName);
+    const targetPath = path.join(uploadDir, uniqueName);
     await fs.writeFile(targetPath, buffer);
 
-    return NextResponse.json({ url: `/uploads/${safeName}`, storage: 'filesystem' });
+    return NextResponse.json({ url: `/uploads/${uniqueName}`, storage: "filesystem" });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "An unexpected error occurred." }, { status: 500 });

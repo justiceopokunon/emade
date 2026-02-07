@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { geminiGenerateJson, parseJsonFromText, slugify } from "@/lib/gemini";
+import { geminiGenerateJson, parseJsonFromText, slugify, isGeminiQuotaError } from "@/lib/gemini";
+import { stories as fallbackStories } from "@/lib/data";
 
 export async function POST() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -45,6 +46,15 @@ Avoid violence or graphic details. Keep language community-focused.`;
     return NextResponse.json({ story });
   } catch (error) {
     console.error("Story generation error:", error);
+    if (isGeminiQuotaError(error)) {
+      const sample = fallbackStories[0];
+      const story = {
+        ...sample,
+        slug: `${slugify(sample?.title || "story")}-${Date.now()}`,
+        status: "draft" as const,
+      };
+      return NextResponse.json({ story, source: "fallback", warning: "Gemini quota exceeded" });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Generation failed" },
       { status: 500 }

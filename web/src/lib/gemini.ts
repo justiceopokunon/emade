@@ -1,6 +1,15 @@
 const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${DEFAULT_GEMINI_MODEL}:generateContent`;
 
+export class GeminiQuotaError extends Error {
+  constructor(message?: string) {
+    super(message || "Gemini quota exceeded");
+    this.name = "GeminiQuotaError";
+  }
+}
+
+const QUOTA_PATTERNS = [/quota/i, /limit: 0/i, /exceeded/i];
+
 export type GeminiResult = {
   text: string;
   raw: unknown;
@@ -34,7 +43,11 @@ export async function geminiGenerateJson(params: {
   if (!res.ok) {
     const message = (raw as { error?: { message?: string } })?.error?.message;
     console.error("Gemini API error:", { status: res.status, message, raw });
-    throw new Error(message || "Gemini request failed");
+    const quotaHit = res.status === 429 || QUOTA_PATTERNS.some((pattern) => pattern.test(message || ""));
+    if (quotaHit) {
+      throw new GeminiQuotaError(message);
+    }
+    throw new Error(message || `Gemini request failed (status ${res.status})`);
   }
 
   const text =
@@ -61,4 +74,17 @@ export function slugify(value: string): string {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+export function isGeminiQuotaError(error: unknown): boolean {
+  if (!error) return false;
+  if (error instanceof GeminiQuotaError) return true;
+  if (error instanceof Error) {
+    const message = error.message || "";
+    return QUOTA_PATTERNS.some((pattern) => pattern.test(message));
+  }
+  if (typeof error === "string") {
+    return QUOTA_PATTERNS.some((pattern) => pattern.test(error));
+  }
+  return false;
 }

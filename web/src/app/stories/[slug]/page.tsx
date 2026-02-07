@@ -50,7 +50,13 @@ export default function StoryDetailPage() {
     fetch("/api/stories", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : fallbackStories))
       .then((data) => {
-        if (active && Array.isArray(data)) setStoryList(data);
+        if (active && Array.isArray(data)) {
+          const normalized = data.map((item: any) => ({
+            ...item,
+            pdfUrl: item?.pdfUrl ?? "",
+          }));
+          setStoryList(normalized);
+        }
       })
       .catch(() => undefined);
     return () => {
@@ -230,7 +236,9 @@ export default function StoryDetailPage() {
         )}
 
         <div className="mt-6 space-y-4 text-sm text-slate-300">
-          {story.body.split("\n").map((paragraph, idx) => (
+          {(typeof story.body === "string" ? story.body : "")
+            .split("\n")
+            .map((paragraph, idx) => (
             <p key={`p-${idx}`} className="text-sm text-slate-300">
               {paragraph}
             </p>
@@ -240,7 +248,7 @@ export default function StoryDetailPage() {
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4 text-sm text-slate-300">
           <span>{story.author}</span>
           <div className="flex flex-wrap gap-2 text-xs text-slate-400">
-            {story.tags.map((tag) => (
+            {(Array.isArray(story.tags) ? story.tags : []).map((tag) => (
               <span key={tag} className="chip bg-white/10 text-slate-100">
                 {tag}
               </span>
@@ -252,6 +260,16 @@ export default function StoryDetailPage() {
           <Link className="btn-ghost" href="/stories">
             More stories
           </Link>
+          {story.pdfUrl && (
+            <a
+              className="btn-ghost"
+              href={story.pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download PDF
+            </a>
+          )}
         </div>
       </article>
 

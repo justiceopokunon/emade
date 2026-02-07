@@ -9,6 +9,7 @@
     "time": "7 min read",
     "status": "active",
     "imageUrl": "/uploads/IMG_4748.png",
+    "pdfUrl": "",
     "tags": [
       "health",
       "awareness",
@@ -25,6 +26,7 @@
     "time": "5 min read",
     "status": "active",
     "imageUrl": "/uploads/device-wiping.png",
+    "pdfUrl": "",
     "tags": [
       "privacy",
       "safety",
@@ -41,6 +43,7 @@
     "time": "4 min read",
     "status": "active",
     "imageUrl": "/uploads/Battery safety.png",
+    "pdfUrl": "",
     "tags": [
       "battery",
       "hazard",

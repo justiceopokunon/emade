@@ -1,5 +1,7 @@
 # 🚀 Deployment & Production Guide
 
+> Looking for the quick environment checklist? See [docs/ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) for step-by-step Vercel + Neon configuration instructions.
+
 ## Current Architecture
 
 E-MADE currently uses **file-based storage** (JSON files in `data/` folder) which works perfectly in **local development** but has limitations in **production (Vercel)**.
@@ -32,51 +34,19 @@ Changes made locally will be committed to the git repository and deployed.
 
 ## 🔧 Production Solutions
 
-### Option 1: Vercel Postgres (Recommended)
+### Option 1: Neon Postgres (Recommended)
 
 **Setup:**
 
-```bash
-# Install Vercel Postgres
-npm install @vercel/postgres
-
-# Add to Vercel project
-vercel env add POSTGRES_URL
-```
+- Provision a Neon Postgres project and note the `postgresql://` URL.
+- Add the connection string to `.env.local` as `DATABASE_URL` / `POSTGRES_URL`.
+- Sync the same values to Vercel using `vercel env add` (see Environment Setup doc).
 
 **Migration Steps:**
 
-1. Create `lib/db.ts` with Postgres queries
-2. Replace file reads/writes with SQL queries  
-3. Migrate existing JSON data to database tables
-4. Update API routes to use database
-
-**Schema:**
-
-```sql
-CREATE TABLE site_data (
-  key VARCHAR(255) PRIMARY KEY,
-  value JSONB NOT NULL,
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE stories (
-  id SERIAL PRIMARY KEY,
-  slug VARCHAR(255) UNIQUE,
-  title TEXT,
-  content JSONB,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE chats (
-  id SERIAL PRIMARY KEY,
-  story_slug VARCHAR(255),
-  name VARCHAR(255),
-  message TEXT,
-  reactions JSONB,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-```
+1. Run `npx tsx database/migrate.ts` to create tables and backfill JSON data.
+2. Confirm `/api/site`, `/api/diy`, `/api/stories`, and `/api/chats` read from Postgres (already implemented).
+3. Deploy to Vercel once `DATABASE_URL` is live.
 
 ### Option 2: Vercel KV (Redis)
 

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { geminiGenerateJson, parseJsonFromText } from "@/lib/gemini";
+import { geminiGenerateJson, parseJsonFromText, isGeminiQuotaError } from "@/lib/gemini";
+import { stats as fallbackStats } from "@/lib/data";
 
 export async function POST() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -27,6 +28,9 @@ Use conservative, realistic values and add context in detail.`;
     if (!Array.isArray(parsed.stats)) throw new Error("No stats returned");
     return NextResponse.json(parsed);
   } catch (error) {
+    if (isGeminiQuotaError(error)) {
+      return NextResponse.json({ stats: fallbackStats, source: "fallback", warning: "Gemini quota exceeded" });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Generation failed" },
       { status: 500 }

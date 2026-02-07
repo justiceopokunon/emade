@@ -20,3 +20,11 @@ Use this file to provide workspace-specific custom instructions to Copilot. For 
 Work through each checklist item systematically.
 Keep communication concise and focused.
 Follow development best practices.
+Stop creating a lot of MD files; create only if necessary
+organize files in a clear structure and delete any unnecessary files.
+make sure the project is clean and and follows best practices and industry standards.
+make sure to use the latest versions of dependencies and tools.
+make sure that unnecessary files are not created and that the project is organized in a clear structure and they are deleted if they are not necessary.
+run all commaands in the terminal and make sure they work correctly.
+dont tell me to do next steps, just do them and report back when they are done.
+only require my input when necessary, otherwise just do the work and report back when it is done.

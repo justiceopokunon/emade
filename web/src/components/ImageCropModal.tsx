@@ -46,9 +46,9 @@ export default function ImageCropModal({
   const [selectedTileSize, setSelectedTileSize] = useState<TileSize>(initialTileSize);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+  const [imageSize, setImageSize] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   const tileSizeKey = (selectedTileSize as string) as keyof typeof TILE_DIMENSIONS;
   const [targetWidth, targetHeight] = TILE_DIMENSIONS[tileSizeKey] || TILE_DIMENSIONS.square;
@@ -68,6 +68,7 @@ export default function ImageCropModal({
         const img = new Image();
         img.onload = () => {
           imageRef.current = img;
+          setImageSize({ width: img.width, height: img.height });
           // Auto-fit image to preview area
           const previewRect = previewRef.current?.getBoundingClientRect();
           const previewWidth = previewRect?.width ?? 500;
@@ -236,8 +237,8 @@ export default function ImageCropModal({
                     transformOrigin: 'center',
                     left: '50%',
                     top: '50%',
-                    marginLeft: imageRef.current ? -imageRef.current.width / 2 : 0,
-                    marginTop: imageRef.current ? -imageRef.current.height / 2 : 0,
+                    marginLeft: imageSize.width ? -imageSize.width / 2 : 0,
+                    marginTop: imageSize.height ? -imageSize.height / 2 : 0,
                     userSelect: 'none',
                     pointerEvents: 'none',
                   }}

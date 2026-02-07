@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
-import { put } from '@vercel/blob';
-import { handleError } from "@/lib/errorHandler";
+import { randomUUID } from "crypto";
+import { put } from "@vercel/blob";
 
 const isBlobConfigured = () => !!process.env.BLOB_READ_WRITE_TOKEN;
 
@@ -18,12 +18,18 @@ export async function POST(request: Request) {
     }
 
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+    const extension = path.extname(safeName) || ".pdf";
+    const baseName = path.basename(safeName, extension);
+    const uniqueSuffix = `${Date.now()}-${randomUUID()}`;
+    const uniqueName = `${baseName}-${uniqueSuffix}${extension}`;
+    const storageKey = `pdfs/${uniqueName}`;
 
     // Try Vercel Blob first if configured
     if (isBlobConfigured()) {
       try {
-        const blob = await put(`pdfs/${safeName}`, file, {
-          access: 'public',
+        const blob = await put(storageKey, file, {
+          access: "public",
+          contentType: "application/pdf",
         });
         return NextResponse.json({ url: blob.url, storage: 'blob' });
       } catch (blobError) {
@@ -50,10 +56,10 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(arrayBuffer);
     const pdfDir = path.join(process.cwd(), "public", "pdfs");
     await fs.mkdir(pdfDir, { recursive: true });
-    const targetPath = path.join(pdfDir, safeName);
+    const targetPath = path.join(pdfDir, uniqueName);
     await fs.writeFile(targetPath, buffer);
 
-    return NextResponse.json({ url: `/pdfs/${safeName}`, storage: 'filesystem' });
+    return NextResponse.json({ url: `/pdfs/${uniqueName}`, storage: 'filesystem' });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "An unexpected error occurred." }, { status: 500 });

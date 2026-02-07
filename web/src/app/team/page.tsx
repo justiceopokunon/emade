@@ -3,18 +3,58 @@
 import { teamMembers } from "@/lib/data";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScrollLoad } from "@/components/ScrollLoad";
 
+interface TeamMember {
+  name: string;
+  role: string;
+  focus: string;
+  avatar?: string;
+  imageUrl?: string;
+  socials?: { label: string; url: string }[];
+}
+
+const normalizeMembers = (incoming?: unknown): TeamMember[] => {
+  const source = (Array.isArray(incoming) && incoming.length > 0 ? incoming : teamMembers) as Array<Record<string, unknown>>;
+  return source.map((member, index) => {
+    const fallback = teamMembers[index] ?? teamMembers[0];
+    const name = typeof member.name === "string" && member.name.trim().length > 0
+      ? member.name.trim()
+      : (fallback?.name ?? "Community steward");
+    const role = typeof member.role === "string" && member.role.trim().length > 0
+      ? member.role.trim()
+      : (fallback?.role ?? "Steward");
+    const focus = typeof member.focus === "string" && member.focus.trim().length > 0
+      ? member.focus.trim()
+      : "Profile details coming soon.";
+    const avatar = typeof member.avatar === "string" && member.avatar.trim().length > 0
+      ? member.avatar.trim().slice(0, 2).toUpperCase()
+      : name.slice(0, 2).toUpperCase();
+    const imageUrl = typeof member.imageUrl === "string" && member.imageUrl.trim().length > 0
+      ? member.imageUrl.trim()
+      : "";
+    const socials = Array.isArray(member.socials)
+      ? member.socials.filter((link) => typeof link?.label === "string" && typeof link?.url === "string" && link.label && link.url)
+      : Array.isArray(fallback?.socials)
+        ? fallback.socials
+        : [];
+
+    return { name, role, focus, avatar, imageUrl, socials };
+  });
+};
+
 export default function TeamPage() {
-  const [members, setMembers] = useState(teamMembers);
+  const [rawMembers, setRawMembers] = useState(teamMembers);
+
+  const members = useMemo(() => normalizeMembers(rawMembers), [rawMembers]);
 
   useEffect(() => {
     fetch("/api/site", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data?.teamMembers && Array.isArray(data.teamMembers)) {
-          setMembers(data.teamMembers);
+        if (Array.isArray(data?.teamMembers)) {
+          setRawMembers(data.teamMembers as typeof teamMembers);
         }
       })
       .catch(() => undefined);

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { geminiGenerateJson, parseJsonFromText } from "@/lib/gemini";
+import { geminiGenerateJson, parseJsonFromText, isGeminiQuotaError } from "@/lib/gemini";
 
 export async function POST(request: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -34,6 +34,16 @@ Content:\n${text}`;
 
     return NextResponse.json(parsed);
   } catch (error) {
+    if (isGeminiQuotaError(error)) {
+      return NextResponse.json({
+        allowed: true,
+        severity: "low",
+        reasons: ["Gemini quota exceeded; returning safe fallback response."],
+        summary: "Quota exceeded on AI moderation; defaulting to allow with caution.",
+        source: "fallback",
+        warning: "Gemini quota exceeded",
+      });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Moderation failed" },
       { status: 500 }

@@ -35,26 +35,26 @@ async function readChatsFromDatabase(storySlug?: string): Promise<ChatsData | Ch
   
   if (storySlug) {
     const rows = await sql`
-      SELECT id, story_slug, name, message, created_at, reactions, reply_to_id, status
+      SELECT message_id, story_slug, name, message, created_at, reactions, reply_to, status, moderated
       FROM chat_messages
       WHERE story_slug = ${storySlug}
       ORDER BY created_at DESC
     `;
     return rows.map((r: any) => ({
-      id: r.id,
+      id: r.message_id,
       storySlug: r.story_slug,
       name: r.name,
       message: r.message,
       at: r.created_at,
       reactions: r.reactions || {},
-      replyTo: r.reply_to_id,
+      replyTo: r.reply_to,
       status: r.status,
-      moderated: true
+      moderated: Boolean(r.moderated)
     }));
   }
   
   const rows = await sql`
-    SELECT id, story_slug, name, message, created_at, reactions, reply_to_id, status
+    SELECT message_id, story_slug, name, message, created_at, reactions, reply_to, status, moderated
     FROM chat_messages
     ORDER BY created_at DESC
   `;
@@ -65,15 +65,15 @@ async function readChatsFromDatabase(storySlug?: string): Promise<ChatsData | Ch
       chats[r.story_slug] = [];
     }
     chats[r.story_slug].push({
-      id: r.id,
+      id: r.message_id,
       storySlug: r.story_slug,
       name: r.name,
       message: r.message,
       at: r.created_at,
       reactions: r.reactions || {},
-      replyTo: r.reply_to_id,
+      replyTo: r.reply_to,
       status: r.status,
-      moderated: true
+      moderated: Boolean(r.moderated)
     });
   });
   
@@ -136,8 +136,8 @@ export async function POST(request: Request) {
         const sql = getDb();
         
         await sql`
-          INSERT INTO chat_messages (id, story_slug, name, message, created_at, reactions, reply_to_id, status)
-          VALUES (${chatMessage.id}, ${chatMessage.storySlug}, ${chatMessage.name}, ${chatMessage.message}, ${chatMessage.at}, ${JSON.stringify(chatMessage.reactions)}, ${chatMessage.replyTo || null}, ${chatMessage.status})
+          INSERT INTO chat_messages (message_id, story_slug, name, message, created_at, reactions, reply_to, status, moderated)
+          VALUES (${chatMessage.id}, ${chatMessage.storySlug}, ${chatMessage.name}, ${chatMessage.message}, ${chatMessage.at}, ${chatMessage.reactions}, ${chatMessage.replyTo || null}, ${chatMessage.status}, ${chatMessage.moderated ?? false})
         `;
         
         return NextResponse.json({ ...chatMessage, storage: 'database' });
@@ -197,7 +197,7 @@ export async function PATCH(request: Request) {
         const sql = getDb();
         
         // Fetch the current message
-        const messages = await sql`SELECT reactions FROM chat_messages WHERE id = ${messageId}`;
+        const messages = await sql`SELECT reactions FROM chat_messages WHERE message_id = ${messageId}`;
         if (messages.length === 0) {
           return NextResponse.json({ error: "Message not found" }, { status: 404 });
         }
@@ -208,21 +208,22 @@ export async function PATCH(request: Request) {
         // Update the message with new reactions
         await sql`
           UPDATE chat_messages
-          SET reactions = ${JSON.stringify(currentReactions)}
-          WHERE id = ${messageId}
+          SET reactions = ${currentReactions}
+          WHERE message_id = ${messageId}
         `;
         
-        const updated = await sql`SELECT * FROM chat_messages WHERE id = ${messageId}`;
+        const updated = await sql`SELECT * FROM chat_messages WHERE message_id = ${messageId}`;
         
         return NextResponse.json({
-          id: updated[0].id,
+          id: updated[0].message_id,
           storySlug: updated[0].story_slug,
           name: updated[0].name,
           message: updated[0].message,
           at: updated[0].created_at,
           reactions: updated[0].reactions,
-          replyTo: updated[0].reply_to_id,
+          replyTo: updated[0].reply_to,
           status: updated[0].status,
+          moderated: updated[0].moderated,
           storage: 'database'
         });
       } catch (dbError) {

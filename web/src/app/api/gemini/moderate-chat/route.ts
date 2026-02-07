@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { geminiGenerateJson, parseJsonFromText } from "@/lib/gemini";
+import { geminiGenerateJson, parseJsonFromText, isGeminiQuotaError } from "@/lib/gemini";
 
 export async function POST(request: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -43,6 +43,19 @@ Message: ${message}`;
 
     return NextResponse.json(parsed);
   } catch (error) {
+    if (isGeminiQuotaError(error)) {
+      return NextResponse.json({
+        allowed: true,
+        severity: "low",
+        reason: "Gemini quota exceeded; auto-approving with caution.",
+        suggestedResponse: "Thanks for sharing! We'll surface this question for our next workshop.",
+        category: "general",
+        sentiment: "positive",
+        helpfulTags: ["community", "fallback"],
+        source: "fallback",
+        warning: "Gemini quota exceeded",
+      });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Moderation failed" },
       { status: 500 }

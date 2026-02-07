@@ -30,6 +30,26 @@ const tileSizeClasses: Record<string, string> = {
 
 const isRemote = (src: string) => /^https?:\/\//.test(src);
 
+const mergeGalleryContent = (
+  incoming?: Partial<typeof defaultGalleryContent>
+): typeof defaultGalleryContent => {
+  const hero = {
+    ...defaultGalleryContent.hero,
+    ...(incoming?.hero ?? {}),
+  };
+  const hydratedSections = defaultGalleryContent.sections.map((section) => {
+    const override = incoming?.sections?.find((item) => item.id === section.id);
+    return { ...section, ...(override ?? {}) };
+  });
+  const extraSections = (incoming?.sections ?? []).filter(
+    (section) => !hydratedSections.some((item) => item.id === section.id)
+  );
+  return {
+    hero,
+    sections: [...hydratedSections, ...extraSections],
+  };
+};
+
 export default function GalleryPage() {
   const [galleryContent, setGalleryContent] = useState(defaultGalleryContent);
   const [galleryTiles, setGalleryTiles] = useState(defaultGalleryTiles);
@@ -97,7 +117,7 @@ export default function GalleryPage() {
           setGalleryTiles(data.galleryTiles);
         }
         if (data.galleryContent) {
-          setGalleryContent(data.galleryContent);
+          setGalleryContent(mergeGalleryContent(data.galleryContent));
         }
       })
       .catch(() => undefined);

@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS stories (
   time VARCHAR(50),
   status VARCHAR(50) DEFAULT 'published',
   image_url TEXT,
+  pdf_url TEXT,
   tags TEXT[] DEFAULT '{}',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

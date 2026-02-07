@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { geminiGenerateJson, parseJsonFromText } from "@/lib/gemini";
+import { geminiGenerateJson, parseJsonFromText, isGeminiQuotaError } from "@/lib/gemini";
+import { diyProjects as fallbackProjects } from "@/lib/data";
 
 export async function POST() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -45,6 +46,17 @@ Keep steps short, safe, and suitable for community workshops.`;
 
     return NextResponse.json({ project });
   } catch (error) {
+    if (isGeminiQuotaError(error)) {
+      const sample = fallbackProjects[0];
+      const project = {
+        ...sample,
+        name: `${sample?.name ?? "DIY Guide"} (${new Date().toLocaleDateString()})`,
+        status: "draft" as const,
+        pdfUrl: sample?.pdfUrl || "",
+        imageUrl: sample?.imageUrl || "",
+      };
+      return NextResponse.json({ project, source: "fallback", warning: "Gemini quota exceeded" });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Generation failed" },
       { status: 500 }

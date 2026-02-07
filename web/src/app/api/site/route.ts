@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
-import { isDatabaseConfigured, getDb } from "@/lib/db";
+import { isDatabaseConfigured, getDb, ensureCoreTables } from "@/lib/db";
 import {
   stats,
   teamMembers,
@@ -40,6 +40,7 @@ async function readDataFromFile() {
 }
 
 async function readDataFromDatabase() {
+  await ensureCoreTables();
   const sql = getDb();
   
   // Fetch all site data rows
@@ -49,7 +50,16 @@ async function readDataFromDatabase() {
   const data: any = { ...defaultSite };
   
   rows.forEach((row: any) => {
-    data[row.key] = row.value;
+    const rawValue = row.value;
+    let parsedValue = rawValue;
+    if (typeof rawValue === "string") {
+      try {
+        parsedValue = JSON.parse(rawValue);
+      } catch {
+        parsedValue = rawValue;
+      }
+    }
+    data[row.key] = parsedValue;
   });
   
   return data;
@@ -69,7 +79,10 @@ async function readData() {
 
 export async function GET() {
   const data = await readData();
-  return NextResponse.json(data);
+  const response = NextResponse.json(data);
+  response.headers.set("Cache-Control", "no-store, max-age=0");
+  response.headers.set("Pragma", "no-cache");
+  return response;
 }
 
 export async function POST(request: Request) {
@@ -79,6 +92,7 @@ export async function POST(request: Request) {
     // Try database first if configured
     if (isDatabaseConfigured()) {
       try {
+        await ensureCoreTables();
         const sql = getDb();
         
         // Update each key separately in the database
@@ -95,13 +109,17 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: true, storage: 'database' });
       } catch (dbError) {
         console.error('Database write failed, attempting file system:', dbError);
-        // Fall through to file system
+        if (isProduction) {
+          return NextResponse.json(
+            { error: 'Database write failed', details: dbError instanceof Error ? dbError.message : 'Unknown error' },
+            { status: 500 }
+          );
+        }
+        // Fall through to file system in development
       }
     }
     
     // File system fallback
-    const isProduction = process.env.VERCEL === "1";
-    
     if (isProduction && !isDatabaseConfigured()) {
       return NextResponse.json(
         { 

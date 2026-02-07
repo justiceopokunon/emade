@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
-import { geminiGenerateJson, parseJsonFromText, slugify } from "@/lib/gemini";
+import { geminiGenerateJson, parseJsonFromText, slugify, isGeminiQuotaError } from "@/lib/gemini";
 import { stories as fallbackStories } from "@/lib/data";
 
 const dataDir = path.join(process.cwd(), "data");
@@ -73,6 +73,21 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, story });
   } catch (error) {
+    if (isGeminiQuotaError(error)) {
+      const sample = fallbackStories[0];
+      const story = {
+        ...sample,
+        status: "draft" as const,
+        slug: `${slugify(sample?.title || "story")}-${Date.now()}`,
+        imageUrl: sample?.imageUrl || "",
+        pdfUrl: "",
+      };
+      const stories = await readStories();
+      const next = [story, ...stories];
+      await fs.mkdir(dataDir, { recursive: true });
+      await fs.writeFile(filePath, JSON.stringify(next, null, 2), "utf8");
+      return NextResponse.json({ ok: true, story, source: "fallback", warning: "Gemini quota exceeded" });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Generation failed" },
       { status: 500 }

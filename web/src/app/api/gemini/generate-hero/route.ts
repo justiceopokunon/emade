@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { geminiGenerateJson, parseJsonFromText } from "@/lib/gemini";
+import { geminiGenerateJson, parseJsonFromText, isGeminiQuotaError } from "@/lib/gemini";
+
+const FALLBACK_HERO_MESSAGE =
+  "E-MADE is a youth-led initiative that tackles the growing crisis of electronic waste by collecting, safely recycling, and repurposing discarded electronics. The project reduces toxic pollution while inspiring hands-on repair skills across the community.";
 
 export async function POST() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -21,6 +24,9 @@ The message should be 1-2 sentences, safety-first, community-focused, and non-te
     if (!parsed.heroMessage) throw new Error("No heroMessage returned");
     return NextResponse.json(parsed);
   } catch (error) {
+    if (isGeminiQuotaError(error)) {
+      return NextResponse.json({ heroMessage: FALLBACK_HERO_MESSAGE, source: "fallback", warning: "Gemini quota exceeded" });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Generation failed" },
       { status: 500 }

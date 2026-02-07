@@ -23,7 +23,13 @@ export default function StoriesPage() {
     fetch("/api/stories", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : stories))
       .then((data) => {
-        if (active && Array.isArray(data)) setStoryList(data);
+        if (active && Array.isArray(data)) {
+          const normalized = data.map((item: any) => ({
+            ...item,
+            pdfUrl: item?.pdfUrl ?? "",
+          }));
+          setStoryList(normalized);
+        }
       })
       .catch(() => undefined);
     return () => {
@@ -130,7 +136,7 @@ export default function StoriesPage() {
             <div className="mt-auto flex items-center justify-between text-sm text-slate-300">
               <span>{story.author}</span>
               <div className="flex gap-2 text-xs text-slate-400">
-                {story.tags.map((tag) => (
+                {(Array.isArray(story.tags) ? story.tags : []).map((tag) => (
                   <span key={tag} className="chip bg-white/10 text-slate-100">
                     {tag}
                   </span>
@@ -141,6 +147,16 @@ export default function StoriesPage() {
               <Link className="btn-ghost" href={`/stories/${getStorySlug(story)}`}>
                 Read full story
               </Link>
+              {story.pdfUrl && (
+                <a
+                  className="btn-ghost"
+                  href={story.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Download PDF
+                </a>
+              )}
             </div>
           </article>
         ))}

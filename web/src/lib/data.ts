@@ -133,6 +133,7 @@ export const stories = [
     time: "7 min read",
     status: "active",
     imageUrl: "/uploads/IMG_4707.jpeg",
+    pdfUrl: "",
     tags: ["health", "awareness", "community"],
   },
   {
@@ -147,6 +148,7 @@ export const stories = [
     time: "5 min read",
     status: "active",
     imageUrl: "/uploads/IMG_4708.jpeg",
+    pdfUrl: "",
     tags: ["privacy", "safety", "education"],
   },
   {
@@ -161,6 +163,7 @@ export const stories = [
     time: "4 min read",
     status: "active",
     imageUrl: "/uploads/IMG_4748.png",
+    pdfUrl: "",
     tags: ["battery", "hazard", "care"],
   },
 ];
@@ -285,27 +288,27 @@ export const adminPanels = [
 export const contactChannels = [
   {
     label: "Instagram",
-    detail: "@emade.social - Follow for updates, tips & stories",
+    detail: "Behind-the-scenes updates, safety tips, and workshop highlights",
     href: "https://instagram.com/emade.social",
   },
   {
     label: "Partnerships",
-    detail: "admin@emade.social",
+    detail: "Collaborations, sponsors, and community programs",
     href: "mailto:admin@emade.social",
   },
   {
     label: "Press",
-    detail: "admin@emade.social",
+    detail: "Media requests, interviews, and feature stories",
     href: "mailto:admin@emade.social",
   },
   {
     label: "Community",
-    detail: "Report unsafe dumping and request a workshop.",
+    detail: "Report unsafe dumping and request a local workshop",
     href: "/stories",
   },
   {
     label: "Learning guides",
-    detail: "Free PDFs on safe handling and responsible recycling.",
+    detail: "Printable safety guides and step-by-step DIY playbooks",
     href: "/diy",
   },
 ];

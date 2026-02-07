@@ -3,18 +3,43 @@
 import { contactChannels } from "@/lib/data";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScrollLoad } from "@/components/ScrollLoad";
 
+interface Channel {
+  label: string;
+  detail: string;
+  href: string;
+}
+
+const normalizeChannels = (incoming?: unknown): Channel[] => {
+  const source = (Array.isArray(incoming) && incoming.length > 0 ? incoming : contactChannels) as Array<Record<string, unknown>>;
+  return source.map((channel, index) => {
+    const fallback = contactChannels[index] ?? contactChannels[0];
+    const label = typeof channel.label === "string" && channel.label.trim().length > 0
+      ? channel.label.trim()
+      : (fallback?.label ?? "Contact");
+    const detail = typeof channel.detail === "string" && channel.detail.trim().length > 0
+      ? channel.detail.trim()
+      : (fallback?.detail ?? "Reach out for support.");
+    const href = typeof channel.href === "string" && channel.href.trim().length > 0
+      ? channel.href.trim()
+      : (fallback?.href ?? "/contact");
+    return { label, detail, href };
+  });
+};
+
 export default function ContactPage() {
-  const [channels, setChannels] = useState(contactChannels);
+  const [rawChannels, setRawChannels] = useState(contactChannels);
+
+  const channels = useMemo(() => normalizeChannels(rawChannels), [rawChannels]);
 
   useEffect(() => {
     fetch("/api/site", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data?.contactChannels && Array.isArray(data.contactChannels)) {
-          setChannels(data.contactChannels);
+        if (Array.isArray(data?.contactChannels)) {
+          setRawChannels(data.contactChannels as typeof contactChannels);
         }
       })
       .catch(() => undefined);
@@ -101,7 +126,7 @@ export default function ContactPage() {
           >
             <p className="text-sm uppercase tracking-[0.25em] text-lime-200">{channel.label}</p>
             <p className="mt-2 text-lg font-semibold text-white">{channel.detail}</p>
-            <p className="mt-2 text-sm text-slate-300">PDFs and responses are free; no paywalls, no surprises.</p>
+            <p className="mt-2 text-sm text-slate-300">Free resources and quick replies from the community team.</p>
           </a>
         ))}
       </div>

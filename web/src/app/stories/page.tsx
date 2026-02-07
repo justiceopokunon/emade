@@ -80,16 +80,18 @@ export default function StoriesPage() {
       </div>
 
       <div className="slideshow relative h-48 w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 sm:h-56 lg:h-64">
-        {storyHero ? (
+        {storyImages.slice(0, 3).map((src, idx) => (
           <Image
-            src={storyHero}
+            key={idx}
+            src={src}
             alt="Story highlights"
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 80vw"
             quality={70}
+            priority={idx === 0}
           />
-        ) : null}
+        ))}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

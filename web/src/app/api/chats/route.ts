@@ -48,6 +48,18 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const isProduction = process.env.VERCEL === "1";
+    
+    if (isProduction) {
+      return NextResponse.json(
+        { 
+          error: "Production filesystem is read-only",
+          message: "Chat messages require Vercel KV or Postgres for production persistence."
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { storySlug, name, message, replyTo } = body;
 
@@ -91,6 +103,18 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    const isProduction = process.env.VERCEL === "1";
+    
+    if (isProduction) {
+      return NextResponse.json(
+        { 
+          error: "Production filesystem is read-only",
+          message: "Reactions require Vercel KV or Postgres for production persistence."
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { storySlug, messageId, reaction } = body;
 

@@ -32,6 +32,18 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const isProduction = process.env.VERCEL === "1";
+    
+    if (isProduction) {
+      return NextResponse.json(
+        { 
+          error: "Production filesystem is read-only",
+          message: "Story changes cannot be saved on Vercel without database. Use localhost or set up Vercel Postgres."
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     if (!Array.isArray(body)) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });

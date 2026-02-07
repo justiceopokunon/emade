@@ -45,6 +45,20 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    // Check if running in production (Vercel)
+    const isProduction = process.env.VERCEL === "1";
+    
+    if (isProduction) {
+      return NextResponse.json(
+        { 
+          error: "Production filesystem is read-only",
+          message: "Changes cannot be saved on Vercel without database integration. Please use localhost for admin edits or set up Vercel KV/Postgres.",
+          suggestion: "Run 'npm run dev' locally or integrate Vercel Postgres"
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const current = await readData();
     const next = { ...current, ...body };

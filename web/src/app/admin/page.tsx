@@ -897,6 +897,43 @@ export default function AdminPage() {
         </form>
       ) : (
         <>
+          {/* Production Environment Warning */}
+          {typeof window !== "undefined" && window.location.hostname !== "localhost" && (
+            <div className="glass mb-6 rounded-2xl border-2 border-yellow-400/40 bg-yellow-400/10 p-6">
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">⚠️</span>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-yellow-300">Production Mode Detected</h3>
+                  <p className="mt-2 text-sm text-slate-200">
+                    This site is running on Vercel's read-only filesystem. Changes made here will <strong>not persist</strong> after deployment or server restart.
+                  </p>
+                  <div className="mt-4 space-y-2 text-sm text-slate-300">
+                    <p className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span>
+                      File uploads (images, PDFs) require Vercel Blob Storage
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span>
+                      Data changes (stories, DIY, team) require Vercel KV or Postgres
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-400"></span>
+                      Local development (localhost) supports all features
+                    </p>
+                  </div>
+                  <div className="mt-4 rounded-xl border border-blue-400/30 bg-blue-400/10 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">Quick Fix Options:</p>
+                    <ol className="mt-2 space-y-1 text-sm text-slate-200">
+                      <li><strong>1. Use localhost:</strong> Run <code className="rounded bg-black/40 px-2 py-0.5">npm run dev</code> locally for full admin access</li>
+                      <li><strong>2. Enable Vercel Blob:</strong> Add <code className="rounded bg-black/40 px-2 py-0.5">BLOB_READ_WRITE_TOKEN</code> to environment variables</li>
+                      <li><strong>3. Add Database:</strong> Set up Vercel Postgres or KV for persistent storage</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {navMenuOpen && (
             <div
               className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"

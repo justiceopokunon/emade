@@ -185,5 +185,5 @@ https://emade.social
 
 - **Live Site:** https://emade.social
 - **Repository:** https://github.com/justiceopokunon/emade
-- **Contact:** hello@emade.social
+- **Contact:** admin@emade.social
 - **Instagram:** @emade.social

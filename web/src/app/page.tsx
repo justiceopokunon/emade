@@ -314,23 +314,23 @@ export default async function Home() {
       </main>
 
       <footer className="mx-auto mt-12 w-full max-w-6xl rounded-2xl border border-white/10 bg-white/5 px-6 py-6 text-sm text-slate-400">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex-1">
             <p className="text-white">E-Made Community Lab</p>
             <p className="text-slate-400">Human-first education on e-waste safety, repair, and responsible recycling. Every guide ships free and printable.</p>
           </div>
-          <div className="flex gap-3 text-xs uppercase tracking-[0.25em] text-slate-300">
-            <Link href="/stories">Forum</Link>
-            <span className="text-slate-600">•</span>
-            <Link href="/diy">DIY</Link>
-            <span className="text-slate-600">•</span>
-            <Link href="/gallery">Gallery</Link>
-            <span className="text-slate-600">•</span>
-            <Link href="/team">Team</Link>
-            <span className="text-slate-600">•</span>
-            <Link href="/contact">Contact</Link>
-            <span className="text-slate-600">•</span>
-            <Link href="/admin" prefetch={false}>Admin</Link>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs uppercase tracking-[0.25em] text-slate-300 sm:flex sm:gap-3">
+            <Link href="/stories" className="whitespace-nowrap hover:text-lime-300">Forum</Link>
+            <span className="hidden text-slate-600 sm:inline">•</span>
+            <Link href="/diy" className="whitespace-nowrap hover:text-lime-300">DIY</Link>
+            <span className="hidden text-slate-600 sm:inline">•</span>
+            <Link href="/gallery" className="whitespace-nowrap hover:text-lime-300">Gallery</Link>
+            <span className="hidden text-slate-600 sm:inline">•</span>
+            <Link href="/team" className="whitespace-nowrap hover:text-lime-300">Team</Link>
+            <span className="hidden text-slate-600 sm:inline">•</span>
+            <Link href="/contact" className="whitespace-nowrap hover:text-lime-300">Contact</Link>
+            <span className="hidden text-slate-600 sm:inline">•</span>
+            <Link href="/admin" prefetch={false} className="whitespace-nowrap hover:text-lime-300">Admin</Link>
           </div>
         </div>
       </footer>

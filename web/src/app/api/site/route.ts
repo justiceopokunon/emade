@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
+import { isDatabaseConfigured, getDb } from "@/lib/db";
 import {
   stats,
   teamMembers,
@@ -29,13 +30,41 @@ const defaultSite = {
   submitCta,
 };
 
-async function readData() {
+async function readDataFromFile() {
   try {
     const raw = await fs.readFile(filePath, "utf8");
     return JSON.parse(raw);
   } catch {
     return defaultSite;
   }
+}
+
+async function readDataFromDatabase() {
+  const sql = getDb();
+  
+  // Fetch all site data rows
+  const rows = await sql`SELECT key, value FROM site_data`;
+  
+  // Reconstruct the site data object from database rows
+  const data: any = { ...defaultSite };
+  
+  rows.forEach((row: any) => {
+    data[row.key] = row.value;
+  });
+  
+  return data;
+}
+
+async function readData() {
+  if (isDatabaseConfigured()) {
+    try {
+      return await readDataFromDatabase();
+    } catch (error) {
+      console.error('Database read failed, falling back to file system:', error);
+      return await readDataFromFile();
+    }
+  }
+  return await readDataFromFile();
 }
 
 export async function GET() {
@@ -45,26 +74,50 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    // Check if running in production (Vercel)
+    const body = await request.json();
+    
+    // Try database first if configured
+    if (isDatabaseConfigured()) {
+      try {
+        const sql = getDb();
+        
+        // Update each key separately in the database
+        for (const [key, value] of Object.entries(body)) {
+          await sql`
+            INSERT INTO site_data (key, value)
+            VALUES (${key}, ${JSON.stringify(value)})
+            ON CONFLICT (key) DO UPDATE SET
+              value = EXCLUDED.value,
+              updated_at = CURRENT_TIMESTAMP
+          `;
+        }
+        
+        return NextResponse.json({ ok: true, storage: 'database' });
+      } catch (dbError) {
+        console.error('Database write failed, attempting file system:', dbError);
+        // Fall through to file system
+      }
+    }
+    
+    // File system fallback
     const isProduction = process.env.VERCEL === "1";
     
-    if (isProduction) {
+    if (isProduction && !isDatabaseConfigured()) {
       return NextResponse.json(
         { 
           error: "Production filesystem is read-only",
-          message: "Changes cannot be saved on Vercel without database integration. Please use localhost for admin edits or set up Vercel KV/Postgres.",
-          suggestion: "Run 'npm run dev' locally or integrate Vercel Postgres"
+          message: "Changes cannot be saved on Vercel without database integration. Please set up Neon Postgres (DATABASE_URL environment variable).",
+          suggestion: "Run locally or configure DATABASE_URL in Vercel environment variables"
         },
         { status: 403 }
       );
     }
 
-    const body = await request.json();
-    const current = await readData();
+    const current = await readDataFromFile();
     const next = { ...current, ...body };
     await fs.mkdir(dataDir, { recursive: true });
     await fs.writeFile(filePath, JSON.stringify(next, null, 2), "utf8");
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, storage: 'filesystem' });
   } catch (error) {
     console.error('Save error:', error);
     return NextResponse.json(

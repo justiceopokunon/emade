@@ -16,8 +16,8 @@ import {
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import AdminPreviewModal from "@/components/AdminPreviewModal";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import AdminPreviewModal, { PreviewSection } from "@/components/AdminPreviewModal";
 import ImageCropModal from "@/components/ImageCropModal";
 import { resizeImage, resizeToTileDimensions } from "@/lib/imageResize";
 
@@ -35,9 +35,23 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
+const normalizeStory = (story: any) => {
+  const title = typeof story?.title === "string" ? story.title : "";
+  const existingSlug = typeof story?.slug === "string" ? story.slug : "";
+  const slugSource = existingSlug.trim() || title || "story";
+  return {
+    ...story,
+    title,
+    slug: slugify(slugSource),
+    pdfUrl: story?.pdfUrl ?? "",
+    tags: Array.isArray(story?.tags) ? story.tags : [],
+  };
+};
+
 type GalleryContent = typeof defaultGalleryContent;
 type GalleryTile = typeof defaultGalleryTiles[number];
 type GalleryTileSize = GalleryTile["size"];
+type DiyDraft = (typeof diyProjects)[number];
 
 const galleryTileSizeOptions: { label: string; value: GalleryTileSize; detail: string }[] = [
   { label: "Square", value: "square", detail: "1x1 tile" },
@@ -47,18 +61,18 @@ const galleryTileSizeOptions: { label: string; value: GalleryTileSize; detail: s
 ];
 
 const adminNavSections = [
-  { id: "overview", label: "Control overview" },
-  { id: "gallery", label: "Gallery tools" },
-  { id: "hero", label: "Hero promise" },
-  { id: "stats", label: "Impact stats" },
-  { id: "slideshows", label: "Slideshows" },
-  { id: "diy", label: "DIY blueprints" },
-  { id: "moderation", label: "Forum moderation" },
-  { id: "stories", label: "Stories" },
-  { id: "team", label: "Team" },
-  { id: "contact", label: "Contact" },
-  { id: "site-navigation", label: "Navigation" },
-  { id: "submit-cta", label: "Submit CTA" },
+  { id: "analytics", label: "Analytics", group: "Overview" },
+  { id: "hero", label: "Hero promise", group: "Content" },
+  { id: "stats", label: "Impact stats", group: "Content" },
+  { id: "slideshows", label: "Slideshows", group: "Media" },
+  { id: "gallery", label: "Gallery tools", group: "Media" },
+  { id: "diy", label: "DIY blueprints", group: "Media" },
+  { id: "moderation", label: "Forum moderation", group: "Community" },
+  { id: "stories", label: "Stories", group: "Community" },
+  { id: "team", label: "Team", group: "Community" },
+  { id: "contact", label: "Contact", group: "Community" },
+  { id: "site-navigation", label: "Navigation", group: "Site" },
+  { id: "submit-cta", label: "Submit CTA", group: "Site" },
 ];
 
 const mergeGalleryContent = (
@@ -91,11 +105,12 @@ export default function AdminPage() {
     "E-MADE is a youth-led initiative that tackles the growing crisis of electronic waste by collecting, safely recycling, and repurposing discarded electronics. The project reduces toxic pollution from improper dumping and burning of e-waste while transforming valuable components into new products for community use. Through public education, hands-on innovation, and responsible recycling practices, E-MADE protects human health, creates green skills for young people, and promotes a circular economy where electronics are reused instead of wasted."
   );
   const [published, setPublished] = useState(true);
-  const [selectedBuild, setSelectedBuild] = useState(diyProjects[0].name);
-  const [selectedStory, setSelectedStory] = useState(stories[0]?.title ?? "");
+  const [selectedBuild, setSelectedBuild] = useState<string>("");
+  const [storyDrafts, setStoryDrafts] = useState(() => stories.map(normalizeStory));
+  const [selectedStorySlug, setSelectedStorySlug] = useState(() => storyDrafts[0]?.slug ?? "");
   const [statDrafts, setStatDrafts] = useState(stats);
-  const [storyDrafts, setStoryDrafts] = useState(stories);
-  const [diyDrafts, setDiyDrafts] = useState(diyProjects);
+  const [diyDrafts, setDiyDrafts] = useState<DiyDraft[]>([]);
+  const [diyHydrated, setDiyHydrated] = useState(false);
   const [teamDrafts, setTeamDrafts] = useState(teamMembers);
   const [contactsDraft, setContactsDraft] = useState(contactChannels);
   const [ewasteSlides, setEwasteSlides] = useState(defaultEwasteImages);
@@ -105,6 +120,13 @@ export default function AdminPage() {
   const [galleryTilesDraft, setGalleryTilesDraft] = useState(defaultGalleryTiles);
   const [activeSection, setActiveSection] = useState(adminNavSections[0].id);
   const [navMenuOpen, setNavMenuOpen] = useState(false);
+  const [configStatus, setConfigStatus] = useState<{
+    hasBlobStorage: boolean;
+    hasDatabase: boolean;
+    hasGeminiApi: boolean;
+    isProduction: boolean;
+    isFullyConfigured: boolean;
+  } | null>(null);
   const [submitCtaDraft, setSubmitCtaDraft] = useState({
     title: "Share your story or idea",
     description: "Have a safety tip, community ad, workshop idea, or e-waste story to share? We'd love to feature it on the site.",
@@ -120,19 +142,20 @@ export default function AdminPage() {
   const [storyStatus, setStoryStatus] = useState("");
   const [diyStatus, setDiyStatus] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
+  const [storyPdfStatus, setStoryPdfStatus] = useState("");
   const [aiStatus, setAiStatus] = useState("");
   const [navStatus, setNavStatus] = useState("");
   const [galleryStatus, setGalleryStatus] = useState("");
   const [galleryTilesStatus, setGalleryTilesStatus] = useState("");
   const [analytics, setAnalytics] = useState<any>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewSection, setPreviewSection] = useState("");
+  const [previewSection, setPreviewSection] = useState<PreviewSection>("hero");
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropImageFile, setCropImageFile] = useState<File | null>(null);
   const [cropTileId, setCropTileId] = useState<string>("");
   const [cropTileSize, setCropTileSize] = useState<GalleryTileSize>("square");
   const [cropTarget, setCropTarget] = useState<"gallery" | "story" | "ewaste" | "storyslide">("gallery");
-  const [cropStoryIndex, setCropStoryIndex] = useState<number | null>(null);
+  const [cropStorySlug, setCropStorySlug] = useState<string>("");
   const [cropSlideIndex, setCropSlideIndex] = useState<number | null>(null);
   const heroDirty = useRef(false);
   const statsDirty = useRef(false);
@@ -148,6 +171,21 @@ export default function AdminPage() {
   const galleryTilesDirty = useRef(false);
 
   const isStrong = useMemo(() => password.length >= 8, [password]);
+  const hasBlobStorage = configStatus?.hasBlobStorage ?? false;
+  const hasDatabase = configStatus?.hasDatabase ?? false;
+  const hasGeminiApi = configStatus?.hasGeminiApi ?? false;
+  const uploadsDisabled = configStatus ? !hasBlobStorage : false;
+  const aiDisabled = configStatus ? !hasGeminiApi : false;
+  const pdfAiDisabled = configStatus ? !hasGeminiApi || !hasBlobStorage : false;
+  const groupedNavSections = useMemo(() => {
+    const groups = new Map<string, typeof adminNavSections>();
+    adminNavSections.forEach((section) => {
+      const group = section.group ?? "Other";
+      if (!groups.has(group)) groups.set(group, []);
+      groups.get(group)?.push(section);
+    });
+    return Array.from(groups.entries()).map(([title, items]) => ({ title, items }));
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -161,6 +199,19 @@ export default function AdminPage() {
       } catch {
         if (!active) return;
         setAuthed(false);
+      }
+    })();
+    // Check configuration status
+    (async () => {
+      try {
+        const res = await fetch("/api/config-status", { cache: "no-store" });
+        if (!active) return;
+        if (res.ok) {
+          const data = await res.json();
+          setConfigStatus(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch config status:", err);
       }
     })();
     return () => {
@@ -196,24 +247,43 @@ export default function AdminPage() {
       .then((res) => (res.ok ? res.json() : stories))
       .then((data) => {
         if (active && Array.isArray(data) && !storyDirty.current) {
-          setStoryDrafts(data);
-          if (data.length > 0 && !data.some((s: { title: string }) => s.title === selectedStory)) {
-            setSelectedStory(data[0].title);
+          const normalized = data.map(normalizeStory);
+          setStoryDrafts(normalized);
+          if (
+            normalized.length > 0 &&
+            !normalized.some((s: { slug: string }) => s.slug === selectedStorySlug)
+          ) {
+            setSelectedStorySlug(normalized[0].slug);
           }
         }
       })
       .catch(() => undefined);
+    setDiyHydrated(false);
     fetch("/api/diy", { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : diyProjects))
       .then((data) => {
-        if (active && Array.isArray(data) && !diyDirty.current) {
-          setDiyDrafts(data);
-          if (data.length > 0 && !data.some((p: { name: string }) => p.name === selectedBuild)) {
-            setSelectedBuild(data[0].name);
-          }
+        if (!active) return;
+        const list = Array.isArray(data) ? data : diyProjects;
+        if (!diyDirty.current) {
+          setDiyDrafts(list);
+        }
+        if (
+          list.length > 0 &&
+          (!selectedBuild || !list.some((project) => project.name === selectedBuild))
+        ) {
+          setSelectedBuild(list[0].name);
         }
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (!active || diyDirty.current) return;
+        setDiyDrafts(diyProjects);
+        if (!selectedBuild && diyProjects.length > 0) {
+          setSelectedBuild(diyProjects[0].name);
+        }
+      })
+      .finally(() => {
+        if (active) setDiyHydrated(true);
+      });
     return () => {
       active = false;
     };
@@ -295,10 +365,48 @@ export default function AdminPage() {
     return () => observer.disconnect();
   }, [authed]);
 
-  const openPreview = (section: string) => {
+  const openPreview = (section: PreviewSection) => {
     setPreviewSection(section);
     setPreviewOpen(true);
   };
+
+  const reloadStories = useCallback(async () => {
+    try {
+      const res = await fetch("/api/stories", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!Array.isArray(data)) return;
+      const normalized = data.map(normalizeStory);
+      storyDirty.current = false;
+      setStoryDrafts(normalized);
+      if (
+        normalized.length > 0 &&
+        !normalized.some((item: { slug: string }) => item.slug === selectedStorySlug)
+      ) {
+        setSelectedStorySlug(normalized[0].slug);
+      }
+    } catch (error) {
+      console.error("Failed to reload stories:", error);
+    }
+  }, [selectedStorySlug]);
+
+  const reloadDiy = useCallback(async () => {
+    try {
+      const res = await fetch("/api/diy", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!Array.isArray(data)) return;
+      diyDirty.current = false;
+      setDiyDrafts(data);
+      if (data.length > 0 && !data.some((project: { name: string }) => project.name === selectedBuild)) {
+        setSelectedBuild(data[0].name);
+      }
+    } catch (error) {
+      console.error("Failed to reload DIY projects:", error);
+    } finally {
+      setDiyHydrated(true);
+    }
+  }, [selectedBuild]);
 
   const getPreviewData = () => {
     return {
@@ -323,10 +431,11 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Failed");
-      setter("Saved to backend storage.");
-    } catch {
-      setter("Save failed. Check server logs.");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || "Failed");
+      setter(data?.storage === "database" ? "Saved to database." : "Saved to backend storage.");
+    } catch (err) {
+      setter(err instanceof Error ? err.message : "Save failed. Check server logs.");
     }
   };
 
@@ -338,10 +447,14 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(storyDrafts),
       });
-      if (!res.ok) throw new Error("Failed");
-      setStoryStatus("Saved to backend storage.");
-    } catch {
-      setStoryStatus("Save failed. Check server logs.");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || "Failed");
+      await reloadStories();
+      setStoryStatus(
+        data?.storage === "database" ? "Saved to database." : "Saved to backend storage."
+      );
+    } catch (err) {
+      setStoryStatus(err instanceof Error ? err.message : "Save failed. Check server logs.");
     }
   };
 
@@ -353,10 +466,14 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(diyDrafts),
       });
-      if (!res.ok) throw new Error("Failed");
-      setDiyStatus("Saved to backend storage.");
-    } catch {
-      setDiyStatus("Save failed. Check server logs.");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || "Failed");
+      await reloadDiy();
+      setDiyStatus(
+        data?.storage === "database" ? "Saved to database." : "Saved to backend storage."
+      );
+    } catch (err) {
+      setDiyStatus(err instanceof Error ? err.message : "Save failed. Check server logs.");
     }
   };
 
@@ -371,7 +488,7 @@ export default function AdminPage() {
   const updateStoryStatus = (status: string) => {
     storyDirty.current = true;
     setStoryDrafts((prev) =>
-      prev.map((s) => (s.title === selectedStory ? { ...s, status } : s))
+      prev.map((s) => (s.slug === selectedStorySlug ? { ...s, status } : s))
     );
     setModerationStatus(`Action queued: ${status}.`);
   };
@@ -396,6 +513,27 @@ export default function AdminPage() {
     }
   };
 
+  const uploadStoryPdf = async (file: File, storySlug: string) => {
+    setStoryPdfStatus("Uploading PDF...");
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload/pdf", {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Upload failed");
+      storyDirty.current = true;
+      setStoryDrafts((prev) =>
+        prev.map((s) => (s.slug === storySlug ? { ...s, pdfUrl: data.url } : s))
+      );
+      setStoryPdfStatus("PDF uploaded. Save stories to persist.");
+    } catch (err) {
+      setStoryPdfStatus("Upload failed. Ensure PDF only.");
+    }
+  };
+
 
   const generateStoryWithGemini = async () => {
     setAiStatus("Generating story...");
@@ -412,8 +550,9 @@ export default function AdminPage() {
       }
       if (!data?.story?.title) throw new Error("No story returned");
       storyDirty.current = true;
-      setStoryDrafts((prev) => [...prev, data.story]);
-      setSelectedStory(data.story.title);
+      const normalizedStory = normalizeStory(data.story);
+      setStoryDrafts((prev) => [...prev, normalizedStory]);
+      setSelectedStorySlug(normalizedStory.slug);
       setAiStatus("Story generated. Review and save.");
     } catch {
       setAiStatus("Story generation failed. Check server logs for details.");
@@ -474,6 +613,55 @@ export default function AdminPage() {
     }
   };
 
+  const triggerDownload = (href: string, filename: string) => {
+    const anchor = document.createElement("a");
+    anchor.href = href;
+    anchor.download = filename;
+    anchor.rel = "noopener";
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  };
+
+  const generateStoryPdfWithGemini = async (storySlug: string) => {
+    const story = storyDrafts.find((s) => s.slug === storySlug);
+    if (!story) {
+      setStoryPdfStatus("Select or load a story first.");
+      return;
+    }
+    setStoryPdfStatus("Generating PDF...");
+    try {
+      const res = await fetch("/api/gemini/generate-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ story }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setStoryPdfStatus(`PDF generation failed: ${data?.error || "Unknown error"}`);
+        return;
+      }
+      if (data?.storage === "inline" && data?.downloadUrl) {
+        const filename = data.fileName || `${slugify(story.title)}.pdf`;
+        triggerDownload(data.downloadUrl, filename);
+        setStoryPdfStatus(
+          data?.warning
+            ? `${data.warning} Download started locally.`
+            : "PDF generated. Download started locally."
+        );
+        return;
+      }
+      if (!data?.url) throw new Error("No PDF URL returned");
+      storyDirty.current = true;
+      setStoryDrafts((prev) =>
+        prev.map((s) => (s.slug === storySlug ? { ...s, pdfUrl: data.url } : s))
+      );
+      setStoryPdfStatus("PDF generated! Save stories to persist.");
+    } catch {
+      setStoryPdfStatus("PDF generation failed. Check server logs.");
+    }
+  };
+
   const generateDiyPdfWithGemini = async (projectName: string) => {
     const project = diyDrafts.find((p) => p.name === projectName);
     if (!project) {
@@ -492,6 +680,16 @@ export default function AdminPage() {
         setUploadStatus(`PDF generation failed: ${data?.error || "Unknown error"}`);
         return;
       }
+      if (data?.storage === "inline" && data?.downloadUrl) {
+        const filename = data.fileName || `${slugify(project.name)}.pdf`;
+        triggerDownload(data.downloadUrl, filename);
+        setUploadStatus(
+          data?.warning
+            ? `${data.warning} Download started locally.`
+            : "PDF generated. Download started locally."
+        );
+        return;
+      }
       if (!data?.url) throw new Error("No PDF URL returned");
       diyDirty.current = true;
       setDiyDrafts((prev) =>
@@ -508,6 +706,7 @@ export default function AdminPage() {
     excerpt?: string;
     body?: string;
     status?: string;
+    slug?: string;
   }) => {
     setAiStatus("Moderating story...");
     try {
@@ -524,10 +723,11 @@ export default function AdminPage() {
         return;
       }
       const nextStatus = data?.allowed ? "active" : "needs-review";
+      const targetSlug = typeof story.slug === "string" ? story.slug : "";
       storyDirty.current = true;
       setStoryDrafts((prev) =>
         prev.map((s) =>
-          s.title === story.title ? { ...s, status: nextStatus } : s
+          s.slug === targetSlug ? { ...s, status: nextStatus } : s
         )
       );
       setModerationStatus(
@@ -601,9 +801,9 @@ export default function AdminPage() {
     setCropModalOpen(true);
   };
 
-  const uploadStoryImage = (file: File, index: number) => {
+  const uploadStoryImage = (file: File, storySlug: string) => {
     setCropTarget("story");
-    setCropStoryIndex(index);
+    setCropStorySlug(storySlug);
     setCropImageFile(file);
     setCropTileSize("landscape");
     setCropModalOpen(true);
@@ -644,14 +844,15 @@ export default function AdminPage() {
       if (cropTarget === "gallery") {
         updateGalleryTile(cropTileId, { src: data.url });
         setGalleryTilesStatus("Image uploaded. Save gallery grid to publish.");
-      } else if (cropTarget === "story" && cropStoryIndex !== null) {
+      } else if (cropTarget === "story" && cropStorySlug) {
         storyDirty.current = true;
         setStoryDrafts((prev) =>
-          prev.map((story, idx) =>
-            idx === cropStoryIndex ? { ...story, imageUrl: data.url } : story
+          prev.map((story) =>
+            story.slug === cropStorySlug ? { ...story, imageUrl: data.url } : story
           )
         );
         setStoryStatus("Story image uploaded. Save stories to publish.");
+        setCropStorySlug("");
       } else if (cropTarget === "ewaste") {
         ewasteDirty.current = true;
         setEwasteSlides((prev) => [...prev, data.url]);
@@ -695,6 +896,7 @@ export default function AdminPage() {
     };
     setDiyDrafts((prev) => [...prev, nextProject]);
     setSelectedBuild(nextName);
+    setDiyHydrated(true);
     setDiyStatus("New guide added. Fill in details and save.");
   };
 
@@ -711,10 +913,11 @@ export default function AdminPage() {
       time: "4 min read",
       status: "draft",
       imageUrl: "",
+      pdfUrl: "",
       tags: ["community"],
     };
     setStoryDrafts((prev) => [...prev, nextStory]);
-    setSelectedStory(nextTitle);
+    setSelectedStorySlug(nextStory.slug);
     setStoryStatus("New story added. Fill in details and save.");
   };
 
@@ -789,12 +992,12 @@ export default function AdminPage() {
     setDiyStatus("DIY removed. Save to persist.");
   };
 
-  const removeStory = (title: string) => {
+  const removeStory = (slug: string) => {
     storyDirty.current = true;
     setStoryDrafts((prev) => {
-      const next = prev.filter((s) => s.title !== title);
-      if (selectedStory === title) {
-        setSelectedStory(next[0]?.title ?? "");
+      const next = prev.filter((s) => s.slug !== slug);
+      if (selectedStorySlug === slug) {
+        setSelectedStorySlug(next[0]?.slug ?? "");
       }
       return next;
     });
@@ -826,7 +1029,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-8 px-6 pb-20 pt-16 sm:px-10 lg:px-12">
+    <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-4 pb-20 pt-12 sm:px-8 lg:px-10">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Image
@@ -897,42 +1100,50 @@ export default function AdminPage() {
         </form>
       ) : (
         <>
-          {/* Production Environment Warning */}
-          {typeof window !== "undefined" && window.location.hostname !== "localhost" && (
+          {/* Production Environment Warning - Only show if missing config */}
+          {configStatus && configStatus.isProduction && !configStatus.isFullyConfigured && (
             <div className="glass mb-6 rounded-2xl border-2 border-yellow-400/40 bg-yellow-400/10 p-6">
               <div className="flex items-start gap-4">
                 <span className="text-3xl">⚠️</span>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-yellow-300">Production Mode Detected</h3>
+                  <h3 className="text-lg font-semibold text-yellow-300">Setup Required</h3>
                   <p className="mt-2 text-sm text-slate-200">
-                    This site is running on Vercel's read-only filesystem. Changes made here will <strong>not persist</strong> after deployment or server restart.
+                    Some features require additional configuration to work in production.
                   </p>
                   <div className="mt-4 space-y-2 text-sm text-slate-300">
-                    <p className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span>
-                      File uploads (images, PDFs) require Vercel Blob Storage
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span>
-                      Data changes (stories, DIY, team) require Vercel KV or Postgres
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-400"></span>
-                      Local development (localhost) supports all features
-                    </p>
+                    {!configStatus.hasBlobStorage && (
+                      <p className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span>
+                        File uploads (images, PDFs) require <code className="rounded bg-black/40 px-1.5 py-0.5">BLOB_READ_WRITE_TOKEN</code>
+                      </p>
+                    )}
+                    {!configStatus.hasDatabase && (
+                      <p className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-red-400"></span>
+                        Data persistence requires <code className="rounded bg-black/40 px-1.5 py-0.5">DATABASE_URL</code>
+                      </p>
+                    )}
+                    {configStatus.hasBlobStorage && configStatus.hasDatabase && (
+                      <p className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-400"></span>
+                        All features configured! Refresh to update.
+                      </p>
+                    )}
                   </div>
                   <div className="mt-4 rounded-xl border border-blue-400/30 bg-blue-400/10 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">Quick Fix Options:</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">Configuration Guide:</p>
                     <ol className="mt-2 space-y-1 text-sm text-slate-200">
-                      <li><strong>1. Use localhost:</strong> Run <code className="rounded bg-black/40 px-2 py-0.5">npm run dev</code> locally for full admin access</li>
-                      <li><strong>2. Enable Vercel Blob:</strong> Add <code className="rounded bg-black/40 px-2 py-0.5">BLOB_READ_WRITE_TOKEN</code> to environment variables</li>
-                      <li><strong>3. Add Database:</strong> Set up Vercel Postgres or KV for persistent storage</li>
+                      <li><strong>1. Local Development:</strong> Run <code className="rounded bg-black/40 px-2 py-0.5">npm run dev</code> for full features</li>
+                      <li><strong>2. Vercel Dashboard:</strong> Add environment variables in project settings</li>
+                      <li><strong>3. Documentation:</strong> See BLOB_STORAGE_SETUP.md for details</li>
                     </ol>
                   </div>
                 </div>
               </div>
             </div>
           )}
+
+          {/* Success message when fully configured */}
 
           {navMenuOpen && (
             <div
@@ -971,29 +1182,90 @@ export default function AdminPage() {
                   Close
                 </button>
               </div>
-              <nav className="mt-4 flex flex-col gap-2">
-                {adminNavSections.map((section) => {
-                  const active = activeSection === section.id;
-                  return (
-                    <button
-                      key={section.id}
-                      type="button"
-                      onClick={() => handleSectionNav(section.id)}
-                      className={`w-full rounded-xl px-4 py-2 text-left text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-300 ${
-                        active
-                          ? "bg-white/20 text-white shadow-[0_12px_30px_-24px_rgba(158,240,26,0.6)]"
-                          : "bg-white/5 text-slate-300 hover:bg-white/10"
-                      }`}
-                    >
-                      {section.label}
-                    </button>
-                  );
-                })}
+              <nav className="mt-4 flex flex-col gap-4">
+                {groupedNavSections.map((group) => (
+                  <div key={group.title} className="space-y-2">
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                      {group.title}
+                    </p>
+                    {group.items.map((section) => {
+                      const active = activeSection === section.id;
+                      return (
+                        <button
+                          key={section.id}
+                          type="button"
+                          onClick={() => handleSectionNav(section.id)}
+                          className={`w-full rounded-xl px-4 py-2 text-left text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-300 ${
+                            active
+                              ? "bg-white/20 text-white shadow-[0_12px_30px_-24px_rgba(158,240,26,0.6)]"
+                              : "bg-white/5 text-slate-300 hover:bg-white/10"
+                          }`}
+                        >
+                          {section.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
               </nav>
             </aside>
           )}
-          <div className="flex flex-col gap-6">
-            <div className="flex-1 space-y-8">
+          <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+            <aside className="hidden lg:block">
+              <div className="glass sticky top-28 rounded-3xl border border-white/10 p-5">
+                <p className="text-xs uppercase tracking-[0.28em] text-slate-300">Console map</p>
+                <div className="mt-4 space-y-4">
+                  {groupedNavSections.map((group) => (
+                    <div key={group.title} className="space-y-2">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                        {group.title}
+                      </p>
+                      {group.items.map((section) => {
+                        const active = activeSection === section.id;
+                        return (
+                          <button
+                            key={section.id}
+                            type="button"
+                            onClick={() => handleSectionNav(section.id)}
+                            className={`w-full rounded-xl px-4 py-2 text-left text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-300 ${
+                              active
+                                ? "bg-white/20 text-white shadow-[0_12px_30px_-24px_rgba(158,240,26,0.6)]"
+                                : "bg-white/5 text-slate-300 hover:bg-white/10"
+                            }`}
+                          >
+                            {section.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-xs uppercase tracking-[0.28em] text-slate-300">Feature status</p>
+                  <div className="mt-3 space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Blob uploads</span>
+                      <span className={`chip ${hasBlobStorage ? "bg-emerald-400/10 text-emerald-300" : "bg-red-400/10 text-red-300"}`}>
+                        {hasBlobStorage ? "Ready" : "Missing"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Database</span>
+                      <span className={`chip ${hasDatabase ? "bg-emerald-400/10 text-emerald-300" : "bg-red-400/10 text-red-300"}`}>
+                        {hasDatabase ? "Ready" : "Missing"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Gemini AI</span>
+                      <span className={`chip ${hasGeminiApi ? "bg-emerald-400/10 text-emerald-300" : "bg-yellow-400/10 text-yellow-300"}`}>
+                        {hasGeminiApi ? "Ready" : "Key needed"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+            <div className="flex-1 space-y-8 min-w-0">
 
           <section id="analytics" className="glass rounded-3xl border border-lime-400/20 p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -1375,7 +1647,12 @@ export default function AdminPage() {
               >
                 Save draft
               </button>
-              <button type="button" className="btn-ghost" onClick={generateHeroWithGemini}>
+              <button
+                type="button"
+                className="btn-ghost disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={generateHeroWithGemini}
+                disabled={aiDisabled}
+              >
                 Generate hero (AI)
               </button>
               <button
@@ -1411,7 +1688,12 @@ export default function AdminPage() {
                 <button type="button" className="btn-ghost" onClick={addStat}>
                   Add stat
                 </button>
-                <button type="button" className="btn-ghost" onClick={generateStatsWithGemini}>
+                <button
+                  type="button"
+                  className="btn-ghost disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={generateStatsWithGemini}
+                  disabled={aiDisabled}
+                >
                   Generate stats (AI)
                 </button>
               </div>
@@ -1631,15 +1913,25 @@ export default function AdminPage() {
                   value={selectedBuild}
                   onChange={(e) => setSelectedBuild(e.target.value)}
                   className="w-full sm:w-[260px] rounded-xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-900 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.8)] outline-none focus:border-lime-400/70 dark:bg-black/60 dark:text-white"
+                  disabled={!diyHydrated && diyDrafts.length === 0}
                 >
-                  {diyDrafts.map((project) => (
-                    <option key={project.name}>{project.name}</option>
-                  ))}
+                  {!diyHydrated && diyDrafts.length === 0 ? (
+                    <option value="">Loading guides...</option>
+                  ) : (
+                    diyDrafts.map((project) => (
+                      <option key={project.name}>{project.name}</option>
+                    ))
+                  )}
                 </select>
                 <button type="button" className="btn-ghost" onClick={addDiy}>
                   Add DIY guide
                 </button>
-                <button type="button" className="btn-ghost" onClick={generateDiyWithGemini}>
+                <button
+                  type="button"
+                  className="btn-ghost disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={generateDiyWithGemini}
+                  disabled={aiDisabled}
+                >
                   Generate DIY (AI)
                 </button>
                 <button
@@ -1653,20 +1945,27 @@ export default function AdminPage() {
               </div>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                <button type="button" className="btn-primary" onClick={() => updateDiyStatus("published")}> 
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => updateDiyStatus("published")}
+                disabled={!selectedBuild || !diyHydrated}
+              >
                 Push PDF live
               </button>
               <button
                 type="button"
                 className="btn-ghost"
-                  onClick={() => updateDiyStatus("qa")}
+                onClick={() => updateDiyStatus("qa")}
+                disabled={!selectedBuild || !diyHydrated}
               >
                 Schedule QA
               </button>
               <button
                 type="button"
                 className="btn-ghost"
-                  onClick={() => updateDiyStatus("archived")}
+                onClick={() => updateDiyStatus("archived")}
+                disabled={!selectedBuild || !diyHydrated}
               >
                 Archive
               </button>
@@ -1674,163 +1973,180 @@ export default function AdminPage() {
             <p className="mt-3 text-xs text-slate-400">
               Update BOM, safety checks, and distribution lists before publishing. All downloads are free PDFs.
             </p>
-            {diyDrafts
-              .filter((p) => p.name === selectedBuild)
-              .map((project, idx) => (
-                <div key={`diy-${idx}`} className="mt-3 grid gap-3 sm:grid-cols-2">
-                  <input
-                    className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
-                    value={project.name}
-                    onChange={(e) => {
-                      diyDirty.current = true;
-                      const nextName = e.target.value;
-                      setDiyDrafts((prev) =>
-                        prev.map((p) =>
-                          p.name === project.name ? { ...p, name: nextName } : p
-                        )
-                      );
-                      setSelectedBuild(nextName);
-                    }}
-                  />
-                  <input
-                    className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
-                    value={project.difficulty}
-                    onChange={(e) => {
-                      diyDirty.current = true;
-                      setDiyDrafts((prev) =>
-                        prev.map((p) =>
-                          p.name === project.name ? { ...p, difficulty: e.target.value } : p
-                        )
-                      );
-                    }}
-                  />
-                  <input
-                    className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
-                    value={project.time}
-                    onChange={(e) => {
-                      diyDirty.current = true;
-                      setDiyDrafts((prev) =>
-                        prev.map((p) =>
-                          p.name === project.name ? { ...p, time: e.target.value } : p
-                        )
-                      );
-                    }}
-                  />
-                  <input
-                    className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
-                    value={project.pdfUrl}
-                    onChange={(e) => {
-                      diyDirty.current = true;
-                      setDiyDrafts((prev) =>
-                        prev.map((p) =>
-                          p.name === project.name ? { ...p, pdfUrl: e.target.value } : p
-                        )
-                      );
-                    }}
-                  />
-                  <input
-                    className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
-                    placeholder="Image URL (cover)"
-                    value={project.imageUrl ?? ""}
-                    onChange={(e) => {
-                      diyDirty.current = true;
-                      setDiyDrafts((prev) =>
-                        prev.map((p) =>
-                          p.name === project.name ? { ...p, imageUrl: e.target.value } : p
-                        )
-                      );
-                    }}
-                  />
-                  <input
-                    id={`diy-image-upload-${idx}`}
-                    type="file"
-                    accept="image/*"
-                    className="sr-only"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const url = await uploadImage(file);
-                      if (!url) return;
-                      diyDirty.current = true;
-                      setDiyDrafts((prev) =>
-                        prev.map((p) =>
-                          p.name === project.name ? { ...p, imageUrl: url } : p
-                        )
-                      );
-                    }}
-                  />
-                  <label
-                    htmlFor={`diy-image-upload-${idx}`}
-                    className="col-span-full inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white"
-                  >
-                    Upload guide image
-                  </label>
-                  <textarea
-                    className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
-                    value={project.outcome}
-                    onChange={(e) => {
-                      diyDirty.current = true;
-                      setDiyDrafts((prev) =>
-                        prev.map((p) =>
-                          p.name === project.name ? { ...p, outcome: e.target.value } : p
-                        )
-                      );
-                    }}
-                  />
-                  <textarea
-                    className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70 sm:col-span-2"
-                    value={project.steps.join("\n")}
-                    onChange={(e) => {
-                      diyDirty.current = true;
-                      const steps = e.target.value
-                        .split("\n")
-                        .map((line) => line.trim())
-                        .filter(Boolean);
-                      setDiyDrafts((prev) =>
-                        prev.map((p) =>
-                          p.name === project.name ? { ...p, steps } : p
-                        )
-                      );
-                    }}
-                  />
-                  <input
-                    className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70 sm:col-span-2"
-                    value={project.impact}
-                    onChange={(e) => {
-                      diyDirty.current = true;
-                      setDiyDrafts((prev) =>
-                        prev.map((p) =>
-                          p.name === project.name ? { ...p, impact: e.target.value } : p
-                        )
-                      );
-                    }}
-                  />
-                  <input
-                    id={`pdf-upload-${idx}`}
-                    type="file"
-                    accept="application/pdf"
-                    className="sr-only"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      uploadPdf(file, project.name);
-                    }}
-                  />
-                  <label
-                    htmlFor={`pdf-upload-${idx}`}
-                    className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white"
-                  >
-                    Upload PDF file
-                  </label>
-                  <button
-                    type="button"
-                    className="inline-flex w-fit items-center gap-2 rounded-full border border-lime-400/40 bg-lime-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-lime-300"
-                    onClick={() => generateDiyPdfWithGemini(project.name)}
-                  >
-                    Generate PDF (AI)
-                  </button>
-                </div>
-              ))}
+            {!diyHydrated && diyDrafts.length === 0 ? (
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-slate-200">
+                Refreshing latest DIY guides…
+              </div>
+            ) : diyDrafts.length === 0 ? (
+              <div className="mt-6 rounded-2xl border border-dashed border-white/15 bg-white/5 p-6 text-sm text-slate-300">
+                No DIY guides yet. Use “Add DIY guide” to create your first blueprint.
+              </div>
+            ) : (
+              diyDrafts
+                .filter((p) => p.name === selectedBuild)
+                .map((project, idx) => (
+                  <div key={`diy-${idx}`} className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <input
+                      className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
+                      value={project.name}
+                      onChange={(e) => {
+                        diyDirty.current = true;
+                        const nextName = e.target.value;
+                        setDiyDrafts((prev) =>
+                          prev.map((p) =>
+                            p.name === project.name ? { ...p, name: nextName } : p
+                          )
+                        );
+                        setSelectedBuild(nextName);
+                      }}
+                    />
+                    <input
+                      className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
+                      value={project.difficulty}
+                      onChange={(e) => {
+                        diyDirty.current = true;
+                        setDiyDrafts((prev) =>
+                          prev.map((p) =>
+                            p.name === project.name ? { ...p, difficulty: e.target.value } : p
+                          )
+                        );
+                      }}
+                    />
+                    <input
+                      className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
+                      value={project.time}
+                      onChange={(e) => {
+                        diyDirty.current = true;
+                        setDiyDrafts((prev) =>
+                          prev.map((p) =>
+                            p.name === project.name ? { ...p, time: e.target.value } : p
+                          )
+                        );
+                      }}
+                    />
+                    <input
+                      className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
+                      value={project.pdfUrl}
+                      onChange={(e) => {
+                        diyDirty.current = true;
+                        setDiyDrafts((prev) =>
+                          prev.map((p) =>
+                            p.name === project.name ? { ...p, pdfUrl: e.target.value } : p
+                          )
+                        );
+                      }}
+                    />
+                    <input
+                      className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
+                      placeholder="Image URL (cover)"
+                      value={project.imageUrl ?? ""}
+                      onChange={(e) => {
+                        diyDirty.current = true;
+                        setDiyDrafts((prev) =>
+                          prev.map((p) =>
+                            p.name === project.name ? { ...p, imageUrl: e.target.value } : p
+                          )
+                        );
+                      }}
+                    />
+                    <input
+                      id={`diy-image-upload-${idx}`}
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      disabled={uploadsDisabled}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const url = await uploadImage(file);
+                        if (!url) return;
+                        diyDirty.current = true;
+                        setDiyDrafts((prev) =>
+                          prev.map((p) =>
+                            p.name === project.name ? { ...p, imageUrl: url } : p
+                          )
+                        );
+                      }}
+                    />
+                    <label
+                      htmlFor={`diy-image-upload-${idx}`}
+                      className={`col-span-full inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white ${
+                        uploadsDisabled ? "pointer-events-none opacity-50" : ""
+                      }`}
+                    >
+                      Upload guide image
+                    </label>
+                    <textarea
+                      className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
+                      value={project.outcome}
+                      onChange={(e) => {
+                        diyDirty.current = true;
+                        setDiyDrafts((prev) =>
+                          prev.map((p) =>
+                            p.name === project.name ? { ...p, outcome: e.target.value } : p
+                          )
+                        );
+                      }}
+                    />
+                    <textarea
+                      className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70 sm:col-span-2"
+                      value={project.steps.join("\n")}
+                      onChange={(e) => {
+                        diyDirty.current = true;
+                        const steps = e.target.value
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .filter(Boolean);
+                        setDiyDrafts((prev) =>
+                          prev.map((p) =>
+                            p.name === project.name ? { ...p, steps } : p
+                          )
+                        );
+                      }}
+                    />
+                    <input
+                      className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70 sm:col-span-2"
+                      value={project.impact}
+                      onChange={(e) => {
+                        diyDirty.current = true;
+                        setDiyDrafts((prev) =>
+                          prev.map((p) =>
+                            p.name === project.name ? { ...p, impact: e.target.value } : p
+                          )
+                        );
+                      }}
+                    />
+                    <input
+                      id={`pdf-upload-${idx}`}
+                      type="file"
+                      accept="application/pdf"
+                      className="sr-only"
+                      disabled={uploadsDisabled}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        uploadPdf(file, project.name);
+                      }}
+                    />
+                    <label
+                      htmlFor={`pdf-upload-${idx}`}
+                      className={`inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white ${
+                        uploadsDisabled ? "pointer-events-none opacity-50" : ""
+                      }`}
+                    >
+                      Upload PDF file
+                    </label>
+                    <button
+                      type="button"
+                      className="inline-flex w-fit items-center gap-2 rounded-full border border-lime-400/40 bg-lime-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+                      onClick={() => generateDiyPdfWithGemini(project.name)}
+                      disabled={pdfAiDisabled}
+                    >
+                      Generate PDF (AI)
+                    </button>
+                  </div>
+                ))
+            )}
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <button type="button" className="btn-primary" onClick={saveDiy}>
                 Save DIY to backend
@@ -1892,28 +2208,33 @@ export default function AdminPage() {
                 <button type="button" className="btn-ghost" onClick={addStory}>
                   Add story
                 </button>
-                <button type="button" className="btn-ghost" onClick={generateStoryWithGemini}>
+                <button
+                  type="button"
+                  className="btn-ghost disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={generateStoryWithGemini}
+                  disabled={aiDisabled}
+                >
                   Generate story (AI)
                 </button>
               </div>
             </div>
             <div className="mt-3">
               <select
-                value={selectedStory}
-                onChange={(e) => setSelectedStory(e.target.value)}
+                value={selectedStorySlug}
+                onChange={(e) => setSelectedStorySlug(e.target.value)}
                 className="w-full sm:w-[320px] rounded-xl border border-white/20 bg-white px-3 py-2 text-sm text-slate-900 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.8)] outline-none focus:border-lime-400/70 dark:bg-black/60 dark:text-white"
               >
                 <option value="">Select a story to edit...</option>
                 {storyDrafts.map((story) => (
-                  <option key={story.title} value={story.title}>{story.title}</option>
+                  <option key={story.slug} value={story.slug}>{story.title || story.slug}</option>
                 ))}
               </select>
               <div className="mt-2">
                 <button
                   type="button"
                   className="btn-ghost"
-                  onClick={() => selectedStory && removeStory(selectedStory)}
-                  disabled={!selectedStory}
+                  onClick={() => selectedStorySlug && removeStory(selectedStorySlug)}
+                  disabled={!selectedStorySlug}
                 >
                   Remove story
                 </button>
@@ -1921,9 +2242,11 @@ export default function AdminPage() {
             </div>
             <div className="mt-4 space-y-3">
               {storyDrafts
-                .filter((story) => story.title === selectedStory)
-                .map((story, idx) => (
-                  <div key={`story-${idx}`} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                .filter((story) => story.slug === selectedStorySlug)
+                .map((story) => {
+                  const currentSlug = story.slug;
+                  return (
+                  <div key={`story-${currentSlug}`} className="rounded-2xl border border-white/10 bg-white/5 p-4">
                     <input
                       className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
                       placeholder="Story title"
@@ -1931,12 +2254,13 @@ export default function AdminPage() {
                       onChange={(e) => {
                         storyDirty.current = true;
                         const nextTitle = e.target.value;
+                        const nextSlug = slugify(nextTitle || currentSlug);
                         setStoryDrafts((prev) =>
                           prev.map((s) =>
-                            s.title === story.title ? { ...s, title: nextTitle } : s
+                            s.slug === currentSlug ? { ...s, title: nextTitle, slug: nextSlug } : s
                           )
                         );
-                        setSelectedStory(nextTitle);
+                        setSelectedStorySlug(nextSlug);
                       }}
                     />
                     <input
@@ -1945,13 +2269,15 @@ export default function AdminPage() {
                       value={story.slug ?? ""}
                       onChange={(e) => {
                         storyDirty.current = true;
+                        const sanitizedSlug = slugify(e.target.value || currentSlug);
                         setStoryDrafts((prev) =>
                           prev.map((s) =>
-                            s.title === story.title
-                              ? { ...s, slug: slugify(e.target.value) }
+                            s.slug === currentSlug
+                              ? { ...s, slug: sanitizedSlug }
                               : s
                           )
                         );
+                        setSelectedStorySlug(sanitizedSlug);
                       }}
                     />
                     <input
@@ -1962,7 +2288,7 @@ export default function AdminPage() {
                         storyDirty.current = true;
                         setStoryDrafts((prev) =>
                           prev.map((s) =>
-                            s.title === story.title ? { ...s, category: e.target.value } : s
+                            s.slug === currentSlug ? { ...s, category: e.target.value } : s
                           )
                         );
                       }}
@@ -1976,7 +2302,7 @@ export default function AdminPage() {
                         storyDirty.current = true;
                         setStoryDrafts((prev) =>
                           prev.map((s) =>
-                            s.title === story.title ? { ...s, excerpt: e.target.value } : s
+                            s.slug === currentSlug ? { ...s, excerpt: e.target.value } : s
                           )
                         );
                       }}
@@ -1990,7 +2316,7 @@ export default function AdminPage() {
                         storyDirty.current = true;
                         setStoryDrafts((prev) =>
                           prev.map((s) =>
-                            s.title === story.title ? { ...s, body: e.target.value } : s
+                            s.slug === currentSlug ? { ...s, body: e.target.value } : s
                           )
                         );
                       }}
@@ -2004,7 +2330,7 @@ export default function AdminPage() {
                           storyDirty.current = true;
                           setStoryDrafts((prev) =>
                             prev.map((s) =>
-                              s.title === story.title ? { ...s, author: e.target.value } : s
+                              s.slug === currentSlug ? { ...s, author: e.target.value } : s
                             )
                           );
                         }}
@@ -2017,7 +2343,7 @@ export default function AdminPage() {
                           storyDirty.current = true;
                           setStoryDrafts((prev) =>
                             prev.map((s) =>
-                              s.title === story.title ? { ...s, time: e.target.value } : s
+                              s.slug === currentSlug ? { ...s, time: e.target.value } : s
                             )
                           );
                         }}
@@ -2035,7 +2361,7 @@ export default function AdminPage() {
                           .filter(Boolean);
                         setStoryDrafts((prev) =>
                           prev.map((s) =>
-                            s.title === story.title ? { ...s, tags } : s
+                            s.slug === currentSlug ? { ...s, tags } : s
                           )
                         );
                       }}
@@ -2048,28 +2374,72 @@ export default function AdminPage() {
                         storyDirty.current = true;
                         setStoryDrafts((prev) =>
                           prev.map((s) =>
-                            s.title === story.title ? { ...s, imageUrl: e.target.value } : s
+                            s.slug === currentSlug ? { ...s, imageUrl: e.target.value } : s
                           )
                         );
                       }}
                     />
                     <input
-                      id={`story-image-upload-${idx}`}
+                      className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-lime-400/70"
+                      placeholder="PDF URL (download link)"
+                      value={story.pdfUrl ?? ""}
+                      onChange={(e) => {
+                        storyDirty.current = true;
+                        setStoryDrafts((prev) =>
+                          prev.map((s) =>
+                            s.slug === currentSlug ? { ...s, pdfUrl: e.target.value } : s
+                          )
+                        );
+                      }}
+                    />
+                    <input
+                      id={`story-image-upload-${currentSlug}`}
                       type="file"
                       accept="image/*"
                       className="sr-only"
                       onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        uploadStoryImage(file, idx);
+                        uploadStoryImage(file, currentSlug);
                       }}
                     />
                     <label
-                      htmlFor={`story-image-upload-${idx}`}
+                      htmlFor={`story-image-upload-${currentSlug}`}
                       className="mt-2 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white"
                     >
                       Upload story image
                     </label>
+                    <input
+                      id={`story-pdf-upload-${currentSlug}`}
+                      type="file"
+                      accept="application/pdf"
+                      className="sr-only"
+                      disabled={uploadsDisabled}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        uploadStoryPdf(file, currentSlug);
+                        e.target.value = "";
+                      }}
+                    />
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <label
+                        htmlFor={`story-pdf-upload-${currentSlug}`}
+                        className={`inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white ${
+                          uploadsDisabled ? "pointer-events-none opacity-50" : ""
+                        }`}
+                      >
+                        Upload story PDF
+                      </label>
+                      <button
+                        type="button"
+                        className="inline-flex w-fit items-center gap-2 rounded-full border border-lime-400/40 bg-lime-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() => generateStoryPdfWithGemini(currentSlug)}
+                        disabled={pdfAiDisabled || !currentSlug}
+                      >
+                        Generate PDF (AI)
+                      </button>
+                    </div>
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
                         type="button"
@@ -2080,7 +2450,8 @@ export default function AdminPage() {
                       </button>
                     </div>
                   </div>
-                ))}
+                );
+                })}
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <button type="button" className="btn-primary" onClick={saveStories}>
@@ -2094,6 +2465,7 @@ export default function AdminPage() {
                 👁 Preview
               </button>
               <span className="text-xs text-slate-400">{storyStatus}</span>
+              <span className="text-xs text-slate-400">{storyPdfStatus}</span>
               <span className="text-xs text-slate-400">{aiStatus}</span>
             </div>
           </section>

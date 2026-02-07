@@ -1,0 +1,49 @@
+# DEPLOYMENT STEPS
+
+## 1. Create Neon Database
+Visit: https://neon.tech/sign-up
+- Sign up
+- Create project "e-made"  
+- Copy connection string
+
+## 2. Set DATABASE_URL in Terminal
+
+$env:DATABASE_URL="postgresql://user:password@host/database?sslmode=require"
+
+## 3. Run Migration
+
+npx tsx database/migrate.ts
+
+Expected output:
+✅ Connected to database
+✅ Schema created successfully  
+✅ Migrated stories
+✅ Migration complete!
+
+## 4. Add to Vercel
+
+Vercel Dashboard → Settings → Environment Variables
+
+Add:
+- DATABASE_URL = [your connection string]
+- Environments: Production, Preview, Development
+
+Storage → Create Blob → "e-made-uploads"
+(Blob token auto-added as BLOB_READ_WRITE_TOKEN)
+
+## 5. Commit & Deploy
+
+git add .
+git commit -m "Production deployment"
+git push origin master
+
+Vercel auto-deploys. Monitor at: https://vercel.com/dashboard
+
+## 6. Verify
+
+Visit: https://emade.social/admin
+- No "read-only" errors
+- Create test story
+- Check /stories page
+- Test chat on story page
+- Verify images upload

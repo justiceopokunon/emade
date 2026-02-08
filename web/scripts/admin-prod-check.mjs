@@ -1,6 +1,11 @@
-const baseUrl = "https://emade.social";
-const password = "slingshot-admin";
+const baseUrl = process.env.ADMIN_CHECK_URL ?? "http://localhost:3000";
+const password = process.env.ADMIN_CHECK_PASSWORD ?? "";
 const results = [];
+
+if (!password) {
+  console.error("Missing ADMIN_CHECK_PASSWORD environment variable.");
+  process.exit(1);
+}
 
 const summarize = (value) => {
   if (value == null) return "";

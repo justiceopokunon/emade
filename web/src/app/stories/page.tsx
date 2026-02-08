@@ -1,52 +1,19 @@
-"use client";
-
-import { stories, storyImages as defaultStoryImages } from "@/lib/data";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { loadStories, normalizeSlug } from "@/lib/storyData";
+import { loadSiteData } from "@/lib/siteData";
+import { storyImages as defaultStoryImages } from "@/lib/data";
 
+export const revalidate = 0;
 
-export default function StoriesPage() {
-  const [storyList, setStoryList] = useState(stories);
-  const slugify = (value: string) =>
-    value
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-  const getStorySlug = (story: { title?: string; slug?: string }) =>
-    slugify((story.slug || story.title || "").trim());
-  const [storyImages, setStoryImages] = useState(defaultStoryImages);
-  const storyHero = storyImages[0];
+const getStorySlug = (story: { title?: string; slug?: string }) =>
+  normalizeSlug(story.slug || story.title || "");
 
-  useEffect(() => {
-    let active = true;
-    fetch("/api/stories", { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : stories))
-      .then((data) => {
-        if (active && Array.isArray(data)) {
-          const normalized = data.map((item: any) => ({
-            ...item,
-            pdfUrl: item?.pdfUrl ?? "",
-          }));
-          setStoryList(normalized);
-        }
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/site", { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (Array.isArray(data?.storyImages) && data.storyImages.length > 0) {
-          setStoryImages(data.storyImages);
-        }
-      })
-      .catch(() => undefined);
-  }, []);
+export default async function StoriesPage() {
+  const [storyList, site] = await Promise.all([loadStories(), loadSiteData()]);
+  const storyImages = Array.isArray(site.storyImages) && site.storyImages.length > 0
+    ? site.storyImages
+    : defaultStoryImages;
 
   return (
     <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-20 pt-12 sm:px-8 sm:pt-16 lg:px-16">
@@ -65,7 +32,7 @@ export default function StoriesPage() {
               Lessons from the front lines.
             </h1>
             <p className="mt-3 max-w-3xl text-lg text-slate-200">
-              Neighbors closest to the problem share what they have learned about safety, justice, and responsible disposal.
+              Neighbors closest to the problem share what keeps their families safe and how to recycle devices without harm.
             </p>
           </div>
         </div>
@@ -88,7 +55,7 @@ export default function StoriesPage() {
       <div className="slideshow relative h-48 w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 sm:h-56 lg:h-64">
         {storyImages.slice(0, 3).map((src, idx) => (
           <Image
-            key={idx}
+            key={src}
             src={src}
             alt="Story highlights"
             fill
@@ -103,7 +70,7 @@ export default function StoriesPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {storyList.map((story) => (
           <article
-            key={story.title}
+            key={`${story.slug}-${story.title}`}
             className="glass relative flex h-full flex-col gap-3 rounded-2xl border border-white/10 p-5"
           >
             {story.imageUrl && (

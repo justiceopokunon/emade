@@ -1,10 +1,8 @@
-"use client";
-
 import { teamMembers } from "@/lib/data";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
 import { ScrollLoad } from "@/components/ScrollLoad";
+import { loadSiteData } from "@/lib/siteData";
 
 interface TeamMember {
   name: string;
@@ -44,21 +42,11 @@ const normalizeMembers = (incoming?: unknown): TeamMember[] => {
   });
 };
 
-export default function TeamPage() {
-  const [rawMembers, setRawMembers] = useState(teamMembers);
+export const revalidate = 0;
 
-  const members = useMemo(() => normalizeMembers(rawMembers), [rawMembers]);
-
-  useEffect(() => {
-    fetch("/api/site", { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (Array.isArray(data?.teamMembers)) {
-          setRawMembers(data.teamMembers as typeof teamMembers);
-        }
-      })
-      .catch(() => undefined);
-  }, []);
+export default async function TeamPage() {
+  const site = await loadSiteData();
+  const members = normalizeMembers(site.teamMembers);
 
   return (
     <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-10 px-4 pb-20 pt-12 sm:px-8 sm:pt-16 lg:px-12">

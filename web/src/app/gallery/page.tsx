@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
 import { ScrollLoad } from "@/components/ScrollLoad";
 import {
   ewasteImages as defaultEwasteImages,
@@ -12,6 +9,11 @@ import {
   galleryContent as defaultGalleryContent,
   galleryTiles as defaultGalleryTiles,
 } from "@/lib/data";
+import { loadSiteData } from "@/lib/siteData";
+import { loadStories } from "@/lib/storyData";
+import { loadDiyProjects } from "@/lib/diyData";
+
+export const revalidate = 0;
 
 const galleryCopyFallback = {
   hero: {
@@ -50,14 +52,23 @@ const mergeGalleryContent = (
   };
 };
 
-export default function GalleryPage() {
-  const [galleryContent, setGalleryContent] = useState(defaultGalleryContent);
-  const [galleryTiles, setGalleryTiles] = useState(defaultGalleryTiles);
+export default async function GalleryPage() {
+  const [site, storyList = defaultStories, projects = defaultDiyProjects] = await Promise.all([
+    loadSiteData(),
+    loadStories(),
+    loadDiyProjects(),
+  ]);
 
-  const [storyList, setStoryList] = useState(defaultStories);
-  const [projects, setProjects] = useState(defaultDiyProjects);
-  const [ewasteSlides, setEwasteSlides] = useState(defaultEwasteImages);
-  const [storySlides, setStorySlides] = useState(defaultStoryImages);
+  const galleryContent = mergeGalleryContent(site.galleryContent);
+  const galleryTiles = Array.isArray(site.galleryTiles) && site.galleryTiles.length > 0
+    ? site.galleryTiles
+    : defaultGalleryTiles;
+  const ewasteSlides = Array.isArray(site.ewasteImages) && site.ewasteImages.length > 0
+    ? site.ewasteImages
+    : defaultEwasteImages;
+  const storySlides = Array.isArray(site.storyImages) && site.storyImages.length > 0
+    ? site.storyImages
+    : defaultStoryImages;
 
   const galleryHero = galleryContent?.hero ?? galleryCopyFallback.hero;
   const findSection = (id: string) =>
@@ -66,68 +77,14 @@ export default function GalleryPage() {
   const ewasteSection = findSection("ewaste");
   const storySlidesSection = findSection("story-slides");
   const storyCoversSection = findSection("story-covers");
-
-  const storyCovers = useMemo(
-    () =>
-      storyList
-        .map((story) => story.imageUrl)
-        .filter((src): src is string => typeof src === "string" && src.length > 0),
-    [storyList]
-  );
-  const diyCovers = useMemo(
-    () =>
-      projects
-        .map((project) => project.imageUrl)
-        .filter((src): src is string => typeof src === "string" && src.length > 0),
-    [projects]
-  );
-
-  useEffect(() => {
-    let active = true;
-    fetch("/api/stories", { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : defaultStories))
-      .then((data) => {
-        if (active && Array.isArray(data)) setStoryList(data);
-      })
-      .catch(() => undefined);
-    fetch("/api/diy", { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : defaultDiyProjects))
-      .then((data) => {
-        if (active && Array.isArray(data)) setProjects(data);
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-    fetch("/api/site", { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!active || !data) return;
-        if (Array.isArray(data.ewasteImages) && data.ewasteImages.length > 0) {
-          setEwasteSlides(data.ewasteImages);
-        }
-        if (Array.isArray(data.storyImages) && data.storyImages.length > 0) {
-          setStorySlides(data.storyImages);
-        }
-        if (Array.isArray(data.galleryTiles) && data.galleryTiles.length > 0) {
-          setGalleryTiles(data.galleryTiles);
-        }
-        if (data.galleryContent) {
-          setGalleryContent(mergeGalleryContent(data.galleryContent));
-        }
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  // Gallery section logic removed
   const diyCoversSection = findSection("diy-covers");
+
+  const storyCovers = storyList
+    .map((story) => story.imageUrl)
+    .filter((src): src is string => typeof src === "string" && src.length > 0);
+  const diyCovers = projects
+    .map((project) => project.imageUrl)
+    .filter((src): src is string => typeof src === "string" && src.length > 0);
 
   return (
     <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-10 px-4 pb-20 pt-12 sm:px-8 sm:pt-16 lg:px-16">

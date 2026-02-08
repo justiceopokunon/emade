@@ -2,17 +2,17 @@ export const stats = [
   {
     label: "Households reached",
     value: "18.4k",
-    detail: "People who received safe handling, data wiping, and drop-off guidance",
+    detail: "Neighbors now confident with safe battery handling and data wipes",
   },
   {
     label: "Safe drop-offs guided",
     value: "3,120+",
-    detail: "Batteries and devices routed to certified recyclers",
+    detail: "Pieces of e-waste handed to certified recyclers this year",
   },
   {
     label: "Students trained",
     value: "12.6k",
-    detail: "Youth learning e-waste safety, repair basics, and reuse ethics",
+    detail: "Students introduced to repair basics and reuse ethics",
   },
 ];
 
@@ -42,7 +42,7 @@ export const navItems = [
 
 export const submitCta = {
   title: "Share your story or idea",
-  description: "Have a safety tip, community ad, workshop idea, or e-waste story to share? We'd love to feature it on the site.",
+  description: "Send the safety tip, ad, or workshop notes you're testing so neighbors can build on it.",
   email: "admin@emade.social",
   buttonText: "Send us your idea",
 };
@@ -52,32 +52,32 @@ export const galleryContent = {
     eyebrow: "Field archive",
     title: "Community safety gallery",
     description:
-      "A visual library of local workshops, safe handling setups, and community learning in motion.",
+      "Photos from clinics, drop-offs, and the fixes our communities run every week.",
   },
   sections: [
     {
       id: "ewaste",
       eyebrow: "E-waste scenes",
       title: "Impact & context",
-      description: "Document e-waste realities, safety moments, and on-the-ground context.",
+      description: "Document the setup and context so others can copy it at home.",
     },
     {
       id: "story-slides",
       eyebrow: "Community stories",
       title: "Story highlights",
-      description: "Spotlight breakthroughs, lessons, and forums worth revisiting.",
+      description: "Spotlight lessons worth revisiting at the next forum night.",
     },
     {
       id: "story-covers",
       eyebrow: "Story covers",
       title: "Featured stories",
-      description: "Auto-filled from published stories and moderation-approved posts.",
+      description: "Pulled straight from the stories neighbors published and approved.",
     },
     {
       id: "diy-covers",
       eyebrow: "Playbook covers",
       title: "DIY safety playbooks",
-      description: "Auto-filled from DIY builds and printable learning kits.",
+      description: "Kept fresh from the DIY playbooks we maintain together.",
     },
   ],
 };
@@ -86,28 +86,28 @@ export const galleryTiles = [
   {
     id: "tile-field-kit",
     title: "Battery triage bench",
-    description: "Emergency bins, tape, and safety notes used at pop-up clinics.",
+    description: "Emergency bins, tape, and notes ready for the next pop-up clinic.",
     src: "/uploads/ewaste-bin.jpg",
     size: "spotlight",
   },
   {
     id: "tile-community-map",
     title: "Community recycler map",
-    description: "Printed drop-off map that lives on every workshop table.",
+    description: "Printed drop-off map we keep on every workshop table.",
     src: "/uploads/recycling-old-laptops.jpg",
     size: "landscape",
   },
   {
     id: "tile-safe-sort",
     title: "Safe sorting bins",
-    description: "Household station built from recycled crates and sand buckets.",
+    description: "Sorting station built from recycled crates and sand buckets.",
     src: "/uploads/safe-sorting-bin.png",
     size: "portrait",
   },
   {
     id: "tile-data-wipe",
     title: "Data wipe checklist",
-    description: "Step cards laminated for wipe clinics and public libraries.",
+    description: "Checklist cards laminated for wipe clinics and libraries.",
     src: "/uploads/device-wiping.png",
     size: "square",
   },
@@ -220,7 +220,7 @@ export const teamMembers = [
   {
     name: "Vroon Tetteh",
     role: "Community Health Lead",
-    focus: "Exposure reduction, safe handling training, and justice-first outreach",
+    focus: "Leads home visits and safety drills that cut down exposure risks",
     avatar: "IM",
     imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
     socials: [
@@ -230,8 +230,8 @@ export const teamMembers = [
   },
   {
     name: "Justice Opoku Nontwiri",
-    role: "Technologist & AI Developer",
-    focus: "AI, web development, and robotics projects that empower African communities",
+    role: "Technologist & Builder",
+    focus: "Builds web tools and robotics projects alongside local partners",
     avatar: "JN",
     imageUrl: "https://justiceopokunon.github.io/DSC_2866_Original.jpeg",
     socials: [
@@ -245,7 +245,7 @@ export const teamMembers = [
   {
     name: "Ghost",
     role: "Learning Experience",
-    focus: "Human-first materials, accessibility, and community learning design",
+    focus: "Designs materials neighbors can run without tech jargon",
     avatar: "LH",
     imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
     socials: [
@@ -256,7 +256,7 @@ export const teamMembers = [
   {
     name: "Ravi Narang",
     role: "Field Organizer",
-    focus: "Community collection drives and certified recycler partnerships",
+    focus: "Runs collection drives and keeps recycler agreements current",
     avatar: "RN",
     imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
     socials: [
@@ -288,27 +288,27 @@ export const adminPanels = [
 export const contactChannels = [
   {
     label: "Instagram",
-    detail: "Behind-the-scenes updates, safety tips, and workshop highlights",
+    detail: "Updates from clinics, safety reminders, and quick wins",
     href: "https://instagram.com/emade.social",
   },
   {
     label: "Partnerships",
-    detail: "Collaborations, sponsors, and community programs",
+    detail: "Start a program or offer support",
     href: "mailto:admin@emade.social",
   },
   {
     label: "Press",
-    detail: "Media requests, interviews, and feature stories",
+    detail: "Reach us for interviews or coverage",
     href: "mailto:admin@emade.social",
   },
   {
     label: "Community",
-    detail: "Report unsafe dumping and request a local workshop",
+    detail: "Report unsafe dumping or request a workshop",
     href: "/stories",
   },
   {
     label: "Learning guides",
-    detail: "Printable safety guides and step-by-step DIY playbooks",
+    detail: "Grab printable guides and DIY steps",
     href: "/diy",
   },
 ];

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StoryChat } from "@/components/StoryChat";
+import { CountingStats } from "@/components/CountingStats";
 import {
   loadStories,
   loadStoryBySlug,
@@ -114,6 +115,14 @@ export default async function StoryPage({ params }: StoryPageProps) {
           <p key={paragraph}>{paragraph}</p>
         ))}
       </article>
+
+      <CountingStats 
+        stats={[
+          { label: "Households reached", value: 100 },
+          { label: "Safe drop-offs guided", value: 170, suffix: "+" },
+          { label: "Students trained", value: 200, suffix: "+" },
+        ]}
+      />
 
       {story.pdfUrl && (
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-slate-200">
